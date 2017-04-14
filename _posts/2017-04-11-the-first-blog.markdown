@@ -4,12 +4,12 @@ title:      "Hey, 这是我的第一篇GitHub博客"
 subtitle:   "If you can quit, then quit. If you cannot quit, your are a writer. - R.A.Salvatore"
 date:       2017-04-10 12:00:00
 author:     "Chris"
-header-img: "img/post-bg-nextgen-web-pwa.jpg"
+header-img: "img/home-bg.jpg"
 header-mask: 0.3
 catalog:    true
 tags:
-    - 前端开发
-    - JavaScript
+    - Web开发
+    - Javascript
 ---
 
 

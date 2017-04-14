@@ -5,8 +5,8 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 13 Apr 2017 23:45:21 -0700</pubDate>
-    <lastBuildDate>Thu, 13 Apr 2017 23:45:21 -0700</lastBuildDate>
+    <pubDate>Fri, 14 Apr 2017 01:57:22 -0700</pubDate>
+    <lastBuildDate>Fri, 14 Apr 2017 01:57:22 -0700</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -211,9 +211,9 @@ $ git push      //推送到 GitHub
         <link>http://localhost:4000/2017/04/10/the-first-blog/</link>
         <guid isPermaLink="true">http://localhost:4000/2017/04/10/the-first-blog/</guid>
         
-        <category>前端开发</category>
+        <category>Web开发</category>
         
-        <category>JavaScript</category>
+        <category>Javascript</category>
         
         
       </item>
