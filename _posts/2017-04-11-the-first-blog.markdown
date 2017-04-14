@@ -132,11 +132,10 @@ $ git clone https://github.com/liclong/liclong.github.io
 随后，将修改的文件同步回 GitHub。现在我们看一下如何将修改的东西同步回去。
 
 ```
-$ git status            //查看仓库中文件修改状况
-
-$ git add index.html    //将文件加入暂存区
-
-$ git push              //现在，GitHub 上的仓库被更新了
+$ git status                //查看仓库中文件修改状况
+$ git add index.html        //将文件加入暂存区
+$ git commit -m "the content of update"
+$ git push                  //现在，GitHub 上的仓库被更新了
 ```
 
 打开你的浏览器，输入你刚建的 Repository 的文件名，例如我的是 liclong.github.io。如下图所示，You get it!
