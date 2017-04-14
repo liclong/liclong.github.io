@@ -381,8 +381,10 @@ gem 'github-pages'
 
 <p>可以查看它在 GitHub 中的代码，并 git clone 到本地。现在将里面的代码全部复制到本地的 liclong.git.io 目录，文件名重复的直接 replace。然后，进入 liclong.github.io 目录，并执行：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ git add .     //多个文件修改时，可以直接用.的方式实现全选
-$ git push      //推送到 GitHub
+<div class="highlighter-rouge"><pre class="highlight"><code>$ git status        //查看哪些文件做过修改
+$ git add .         //多个文件修改时，可以直接用.的方式实现全选
+$ git commit -m "this is an update"
+$ git push          //推送到 GitHub
 </code></pre>
 </div>
 

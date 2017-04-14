@@ -5,8 +5,8 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 14 Apr 2017 01:57:22 -0700</pubDate>
-    <lastBuildDate>Fri, 14 Apr 2017 01:57:22 -0700</lastBuildDate>
+    <pubDate>Fri, 14 Apr 2017 02:04:32 -0700</pubDate>
+    <lastBuildDate>Fri, 14 Apr 2017 02:04:32 -0700</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -187,8 +187,10 @@ gem 'github-pages'
 
 &lt;p&gt;可以查看它在 GitHub 中的代码，并 git clone 到本地。现在将里面的代码全部复制到本地的 liclong.git.io 目录，文件名重复的直接 replace。然后，进入 liclong.github.io 目录，并执行：&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git add .     //多个文件修改时，可以直接用.的方式实现全选
-$ git push      //推送到 GitHub
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git status        //查看哪些文件做过修改
+$ git add .         //多个文件修改时，可以直接用.的方式实现全选
+$ git commit -m &quot;this is an update&quot;
+$ git push          //推送到 GitHub
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 

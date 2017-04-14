@@ -189,8 +189,10 @@ $ bundle exec jekyll serve
 可以查看它在 GitHub 中的代码，并 git clone 到本地。现在将里面的代码全部复制到本地的 liclong.git.io 目录，文件名重复的直接 replace。然后，进入 liclong.github.io 目录，并执行：
 
 ```
-$ git add .     //多个文件修改时，可以直接用.的方式实现全选
-$ git push      //推送到 GitHub
+$ git status        //查看哪些文件做过修改
+$ git add .         //多个文件修改时，可以直接用.的方式实现全选
+$ git commit -m "this is an update"
+$ git push          //推送到 GitHub
 ```
 
 打开浏览器，登录 http://liclong.github.io，你会看到 slate 主题的网页里。修改 index.html 文件即可进行修改。具体细节可实际摸索。
