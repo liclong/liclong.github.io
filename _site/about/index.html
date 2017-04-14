@@ -10,7 +10,7 @@
     <meta name="keywords"  content="Coop, 云计算, ChrisLi, 极客, @liclong, 楼长de博客, Chris‘ Blog, 互联网, 设计, 产品，USTC, UCLA, 智慧城市">
     <meta name="theme-color" content="#000000">
     
-    <title>来自COOP楼长的博客 | Chris' Blog</title>
+    <title>About - 来自COOP楼长的博客 | Chris' Blog</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/">
+    <link rel="canonical" href="http://localhost:4000/about/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -150,14 +150,14 @@
 
 
     <!-- Page Header -->
-<header class="intro-header" style="background-image: url('/img/home-bg-o.jpg')">
+<header class="intro-header" style="background-image: url('/img/post-bg-digital-native.jpg')">
     <div class="container">
         <div class="row">
             <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
                 <div class="site-heading">
-                    <h1>Chris' Blog</h1>
+                    <h1>About</h1>
                     <!--<hr class="small">-->
-                    <span class="subheading">来自COOP楼长的博客</span>
+                    <span class="subheading">Hey, this is Chris.</span>
                 </div>
             </div>
         </div>
@@ -178,34 +178,131 @@
                 col-xs-12
                 postlist-container
             ">
-    			
-<div class="post-preview">
-    <a href="/2017/04/10/the-first-blog/">
-        <h2 class="post-title">
-            Hey, 这是我的第一篇GitHub博客
-        </h2>
-        
-        <h3 class="post-subtitle">
-            If you can quit, then quit. If you cannot quit, your are a writer. - R.A.Salvatore
-        </h3>
-        
-        <div class="post-content-preview">
-            为什么写博客
-关于“为什么写博客”，这其实是个和“博客”一样古老的话题，一百个人能拿出一千个截然不同的理由来回答，联系度娘还能问出更多。而我蹩脚的选择在博客时代早就过去的现在开始动笔（貌似微博的热潮也消退了），除了本人比较慢热以及反应迟钝外，也是基于个人的一些经历和教训。这里希望分享出来可供大家参考。
+    			<!-- Language Selector -->
+<select class="sel-lang" onchange= "onLanChange(this.options[this.options.selectedIndex].value)">
+    <option value="0" selected> 中文 Chinese </option>
+    <option value="1"> 英文 English </option>
+</select>
 
-一、好记性不如烂笔头
+<!-- Chinese Version -->
+<div class="zh post-container">
 
-之前在学校零零星星参与过一些项目，但遗憾的是，随着时间的推移，稍...
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by Chris on April 10, 2017
-    </p>
+    <!--copied from markdown -->
+    <blockquote><p>Stay foolish, Stay hungry.</p></blockquote>
+
+    <p>Hey，我是<strong>李昌龙</strong>，码农 &amp; 搬砖工，曾就读于<a href="http://www.ustc.edu.cn/">USTC</a>和<a href="http://www.ucla.edu/">UCLA</a>，博士。</p>
+
+    <p>一些作品和开源项目，请戳 <a href="http://github.com/huxpro">Github</a>。</p>
+    
+    <p>音乐重度依赖患者，设计师强迫症患者，书买得比看得多患者，毒舌患者，科技产品发布会观看癖患者，间歇性感伤患者，习惯性熬夜患者。</p>
+    <!--
+    <h5>Talks</h5>
+
+    <ul>
+    <li><a href="//huangxuan.me/2016/11/20/sw-101-gdgdf/">Service Worker 101</a> · GDG DevFest 北京 2016</li>
+    <li><a href="//huangxuan.me/2016/10/20/pwa-qcon2016/">Progressive Web Apps 复兴序章</a> · <a href="http://2016.qconshanghai.com/presentation/3111">QCon 上海 2016</a></li>
+    <li><a href="//huangxuan.me/2016/06/05/pwa-in-my-pov/">Progressive Web App 之我见</a> · IO Redux 北京 2016</li>
+    <li><a href="//huangxuan.me/2015/12/28/css-sucks-2015/">CSS Still Sucks 2015</a> · 2015</li>
+    <li><a href="//huangxuan.me/2015/07/09/js-module-7day/">JavaScript 模块化七日谈</a> · 2015</li>
+    </ul>
+     -->
 </div>
-<hr>
+
+<!-- English Version -->
+<div class="en post-container">
+    <blockquote><p>Stay foolish, Stay hungry.</p></blockquote>
+
+    <p>Hi, I am <strong>Changlong Li (李昌龙)</strong>，you can call me <strong>Chris</strong>. I'm a PHD of USTC and UCLA. I am a designer who builds softwares on <a href="http://github.com/liclong">Github</a>.</p>
+
+<!--
+    <h5>Talks</h5>
+    <ul>
+    <li><a href="//huangxuan.me/2016/11/20/sw-101-gdgdf/" title="Service Worker 101 - working offline and instant loading">Service Worker 101</a> · GDG DevFest Beijing 2016</li>
+    <li><a href="//huangxuan.me/2016/10/20/pwa-qcon2016/" title="Progressive Web Apps - make web great again">Progressive Web Apps</a> · QCon Shanghai 2016</li>
+    <li><a href="//huangxuan.me/2016/06/05/pwa-in-my-pov/" title="Progressive Web App in my point of view">Progressive Web App in my POV</a> · IO Redux Beijing 2016</li>
+    <li><a href="//huangxuan.me/2015/12/28/css-sucks-2015/" title="CSS Still Sucks 2015 - and how we work around it">CSS Still Sucks 2015</a> · 2015</li>
+    <li><a href="//huangxuan.me/2015/07/09/js-module-7day/">JavaScript Modularization Journey</a> · 2015</li>
+    </ul>
+-->
+</div>
+
+<!-- Handle Language Change -->
+<script type="text/javascript">
+    // get nodes
+    var $zh = document.querySelector(".zh");
+    var $en = document.querySelector(".en");
+    var $select = document.querySelector("select");
+
+    // bind hashchange event
+    window.addEventListener('hashchange', _render);
+
+    // handle render
+    function _render(){
+        var _hash = window.location.hash;
+        // en
+        if(_hash == "#en"){
+            $select.selectedIndex = 1;
+            $en.style.display = "block";
+            $zh.style.display = "none";
+        // zh by default
+        }else{
+            // not trigger onChange, otherwise cause a loop call.
+            $select.selectedIndex = 0;
+            $zh.style.display = "block";
+            $en.style.display = "none";
+        }
+    }
+
+    // handle select change
+    function onLanChange(index){
+        if(index == 0){
+            window.location.hash = "#zh"
+        }else{
+            window.location.hash = "#en"
+        }
+    }
+
+    // init
+    _render();
+</script>
 
 
-<!-- Pager -->
+
+
+<!-- 多说评论框 start -->
+<div class="comment">
+    <!-- This id is used for indexing my loss comments forcedly -->
+    <div class="ds-thread"
+    
+    <!-- U can just use this key generated to index comments at page about -->
+        data-thread-key="liclong/about"
+    
+
+    data-title="About"
+    data-url="http://localhost:4000/about/"></div>
+</div>
+<!-- 多说评论框 end -->
+
+<!-- 多说公共JS代码 start (一个网页只需插入一次) -->
+<script type="text/javascript">
+    // dynamic User hacking by Hux
+    var _user = 'liclong';
+
+    // duoshuo comment query.
+    var duoshuoQuery = {short_name: _user };
+    (function() {
+        var ds = document.createElement('script');
+        ds.type = 'text/javascript';ds.async = true;
+        ds.src = (document.location.protocol == 'https:' ? 'https:' : 'http:') + '//static.duoshuo.com/embed.js';
+        ds.charset = 'UTF-8';
+        (document.getElementsByTagName('head')[0]
+         || document.getElementsByTagName('body')[0]).appendChild(ds);
+    })();
+</script>
+<!-- 多说公共JS代码 end -->
+
+
+
 
 
     		</div>

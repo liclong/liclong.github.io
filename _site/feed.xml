@@ -1,0 +1,222 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<rss version="2.0" xmlns:atom="http://www.w3.org/2005/Atom">
+  <channel>
+    <title>Chris' Blog</title>
+    <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
+    <link>http://localhost:4000/</link>
+    <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
+    <pubDate>Thu, 13 Apr 2017 23:45:21 -0700</pubDate>
+    <lastBuildDate>Thu, 13 Apr 2017 23:45:21 -0700</lastBuildDate>
+    <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>Hey, 这是我的第一篇GitHub博客</title>
+        <description>&lt;h2 id=&quot;为什么写博客&quot;&gt;为什么写博客&lt;/h2&gt;
+&lt;p&gt;关于“为什么写博客”，这其实是个和“博客”一样古老的话题，一百个人能拿出一千个截然不同的理由来回答，联系度娘还能问出更多。而我蹩脚的选择在博客时代早就过去的现在开始动笔（貌似微博的热潮也消退了），除了本人比较慢热以及反应迟钝外，也是基于个人的一些经历和教训。这里希望分享出来可供大家参考。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;一、好记性不如烂笔头&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;之前在学校零零星星参与过一些项目，但遗憾的是，随着时间的推移，稍早之前做的工作很大一部分都记不清细节了。这导致了一个严重后果：再上类似项目，需要大量的返工和重新调研。这无疑大大降低了工作的效率。&lt;/p&gt;
+
+&lt;p&gt;举个例子，之前在 &lt;a href=&quot;http://metro.cs.ucla.edu/mobile_insight/&quot;&gt;MobileInsight&lt;/a&gt; 项目中第一次接触 git，主要用于团队间代码的同步和版本控制，所以当时对 git 命令还算比较熟悉，但之后相当长一段时间就再没用过。最近毕业在即，想到利用 GitHub 博客对之前工作进行梳理，才忽然发现很多 git 命令需要重新翻查了。&lt;/p&gt;
+
+&lt;p&gt;所以啊，必须承认，我写博客的第一动机是方便自己以后翻阅，还请各位看官不要介意。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;二、Open Source 的魅力&lt;/b&gt;&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;“通过分享，你获得了直接而快速的回报，你最终或许会发现你已将版权和“保留所有权利”抛诸脑后。新的经济学准则是：参与你作品的人越多，回报越高。在分享主义里，如果你愿意你可以保留所有权，但是我乐于分享。” by 毛向辉 《分享主义：一场思维革命》&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;相信很多人和我一样，第一次接触博客是从读某一篇技术帖开始的，而那篇帖子往往也因为帮你解决了某个 Bug 或 Error 而挽救了自己即将崩溃的内心以及即将被老板痛骂的悲惨命运。也正是多次这样的经历，强化了我对技术博客的由衷好感以及诸多大牛博主的感激之情（TechCrunch 的阿灵顿除外）。当然，除了大量国内分享的技术博客以外，还有大量国外分享的代码，这些共同构造了今天的互联网精神：开源！&lt;/p&gt;
+
+&lt;p&gt;在互联网大潮下，“教会徒弟饿死师傅”的理论已经站不住脚，因为只要把眼光和格局放大一点，你会惊喜的发现身边的人只是你暂时的竞争者，却也是你长期的伙伴。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;三、持续学习的动力&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;完成任何一件事，包括写一篇文章，都需要首先获取第一手资料，寻找信息来源、将调研的结果转化为情报并最终为自己所用，这本身就是一个知识积累和自身提升的过程。同时，你慢慢就学会了鉴别知识：哪些是行业关注的焦点，哪些技术在三到五年内还只能是概念股。在这个过程中，你会慢慢重塑自己浮躁的性格并学会专注：默默地持续做一件事是一种难得的能力，也是一种难得的品质。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;四、思维的良好训练&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;很多东西你以为懂了，但当你在写下来的时候，你就觉得无从下手了。如果一件事情你不能讲清楚，十有八九你还没有完全理解。这一论断被无数次的提起，也因为被过于频繁的提起而被无数次的忽视。将事情写下来，慢慢就可以提高你的逻辑思维能力，分析能力，写会迫使你在你脑中搭建一个有条理的框架。例如我写这篇文章一样，我就将值得写博客的原因一点一点地罗列出来，事情就更加清晰，你也可以更好的思考问题。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;五、探索全新的领域&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;世界不止是你的家，你的公司，你的朋友圈，你应该去发现一个更大的世界，通过写博客，你会知道世界上还有很多人像你一样在写博客，这些人和知识正在世界的某个角落在等着你。
+例如，在写这篇文章的过程中，我才知道了Gabriel Weinberg，我才要将阳志平的博客重读一遍。写的过程会让你有很多新的发现，这些新的发现都值得你去再写下来，总结分享出去。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;六、赠人玫瑰，手有余香&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;隔一段时间，再回头看自己写的博客，你会发现自己正在通过这样的方式在不断的成长，这种成长在自己眼里是一种财富，在别人眼里是一张地图，你得到了收获，不断修正自己的错误，别人得到了指引，避免走弯路&lt;/p&gt;
+
+&lt;h2 id=&quot;如何使用github搭建博客&quot;&gt;如何使用GitHub搭建博客&lt;/h2&gt;
+&lt;p&gt;闲话少说，GitHub搭建博客的步骤记录如下。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;一、学习使用GitHub&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;首先进入GitHub并申请账号，Google输入github，点击第一条进入，如下图。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/google-github.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;想了解GitHub的童鞋可参见知乎：&lt;a href=&quot;https://www.zhihu.com/question/19968479/&quot;&gt;https://www.zhihu.com/question/19968479/&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;进入GitHub主页后请首先注册账号。并创建一个 Repositories，命名为”&lt;em&gt;username&lt;/em&gt;.github.io”。注意，这里，&lt;em&gt;username&lt;/em&gt; 是你刚才注册的 GitHub 账号名，我的账号名是 &lt;b&gt;&lt;em&gt;liclong&lt;/em&gt;&lt;/b&gt;，因此这里填: “&lt;b&gt;&lt;em&gt;liclong&lt;/em&gt;&lt;/b&gt;.github.io”。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-repositories.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;二、建立本地与GitHub的连接&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;1. 本地电脑安装 git&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;接下来我们在本地环境中实际安装 git，并进行各种设置。如果使用 Mac 可以忽略安装过程，因为系统已默认集成了这一功能，使用 Ubuntu 和 Windows 的童鞋可以参考：&lt;a href=&quot;https://git-scm.com/book/en/v2/Getting-Started-Installing-Git&quot;&gt;《Getting Started - Installing Git》&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;下面我们对本地计算机里安装的 git 进行设置，首先设置的是使用 Git 时的姓名和邮箱地址。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git config --global user.name &quot;firstname lastname&quot;
+$ git config --global user.email &quot;youemail@gmail.com&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;设置完毕后可通过 ~/.gitconfig 文件进行更改。这里设置的姓名和邮箱地址会用在 Git 的提交日志。由于在 GitHub 上公开仓库后，这里的姓名和邮箱地址也会被一并公开，所以注意不要使用不便公开的隐私信息。&lt;/p&gt;
+
+&lt;p&gt;此外，在 GitHub 上公开博客或源码后，前来参考的程序员可能来自世界任何地方，所以不要使用汉字，很多外国友人的中文水平远不如我们的英文水平。当然，如果不想使用真名，完全可以使用网络上的昵称。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;2. 本地创建密钥&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;GitHub上连接已有仓库时的认证，是通过使用 SSH 的公开密钥认证方式进行的。现在我们来创建公开密钥认证所需的 SSH Key，并将其添加至GitHub。如果已经创建过，可以使用现有的密钥进行设置。&lt;/p&gt;
+
+&lt;p&gt;运行下面的命令创建 SSH Key。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ ssh-keygen -t rsa -C &quot;youremail@gmail.com&quot;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这里，“&lt;em&gt;youremail&lt;/em&gt;@gmail.com” 部分改成你在创建GitHub账号时用的邮箱地址。最终，系统会在 Home 目录的一个隐藏文件夹 .ssh 下生成公钥 id_rsa.pub 和私钥 id_rsa。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;3. 添加公钥到 GitHub&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;在GitHub上添加公钥，今后就可以用私钥进行认证了。&lt;/p&gt;
+
+&lt;p&gt;点击右上角的账户设定按钮（Account Settings），选择 SSH and GPG Keys 菜单，就会出现如下界面。点击 Add SSH Key，会出现 Title 和 Key 两个输入框。在 Title 中输入适当的密钥名称，Key 部分粘贴 id_rsa.pub 文件里的内容。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-sshkey.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;如此一来，本地电脑和远端的 GitHub 服务器就建立了可信的连接。以后可以通过 git 命令快捷的从 GitHub 克隆项目，并将修改后的项目更新到 GitHub。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;三、先走一遍流程&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;要了解一个项目，最快捷的方法就是先从头到尾过一遍。所以，我们首先创建一个最简单的网页，介绍从创建 GitHub 到访问网页到整个流程，以帮助大家理解。打开终端输入如下命令：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git clone https://github.com/liclong/liclong.github.io
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这样可以将刚才在 GitHub 上创建的 Repositories 克隆到本地，你会发现在当前路径下多了一个文件夹：“liclong.github.io”。然后后续操作可以在本地进行，只需将最终版本再上传回 GitHub 即可。我们在克隆到本地的 liclong.github.io 目录下新建一个文件：index.html，这是网站的入口。文件编辑如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;cp&quot;&gt;&amp;lt;!DOCTYPE html&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;html&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;head&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;title&amp;gt;&lt;/span&gt;liclong.github.io&lt;span class=&quot;nt&quot;&gt;&amp;lt;/title&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/head&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;body&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;p&amp;gt;&amp;lt;a&lt;/span&gt; &lt;span class=&quot;na&quot;&gt;href=&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;http://www.google.com&quot;&lt;/span&gt;&lt;span class=&quot;nt&quot;&gt;&amp;gt;&lt;/span&gt;Link to another page&lt;span class=&quot;nt&quot;&gt;&amp;lt;/a&amp;gt;&lt;/span&gt;.&lt;span class=&quot;nt&quot;&gt;&amp;lt;/p&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/body&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/html&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;随后，将修改的文件同步回 GitHub。现在我们看一下如何将修改的东西同步回去。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git status            //查看仓库中文件修改状况
+
+$ git add index.html    //将文件加入暂存区
+
+$ git push              //现在，GitHub 上的仓库被更新了
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;打开你的浏览器，输入你刚建的 Repository 的文件名，例如我的是 liclong.github.io。如下图所示，You get it!&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-link.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;说白了，GitHub 提供了这样一种页面解析功能，你既可以拿它制作博客，也可以拿它做个人主页，功能就在那里，用途任你选择。详情可参考 &lt;a href=&quot;https://pages.github.com/&quot;&gt;GitHub Pages&lt;/a&gt; 官方主页。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;四、使用Jekyll进行本地调试&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;有一个问题，每次微调后都要同步回 GitHub 查看页面修改结果？ NO！&lt;/p&gt;
+
+&lt;p&gt;理想的方式应该是，本地进行调试和预览，只把最终的版本上传至 GitHub 供大家浏览。幸运的是，Jekyll 提供这样的功能。&lt;/p&gt;
+
+&lt;p&gt;打开 terminal, 安装 Ruby （Mac上已经预装了Ruby）。可以输入 $ ruby –version 去验证是否安装。&lt;/p&gt;
+
+&lt;p&gt;接下来，输入sudo gem install github-pages，安装 Jekyll (gem update github-pages命令可以用来更新 Jekyll，以免 Github 服务器更新导致网站本地和线上表现不同)&lt;/p&gt;
+
+&lt;p&gt;之后你需要在 master 下新建一个 file，命名为 Gemfile，输入&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;source 'https://rubygems.org'
+gem 'github-pages'
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;运行 terminal，使用命令行移至 repository 根目录下（也就是刚才从 GitHub 上克隆下来的 liclong.github.io 目录）。之后运行&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ bundle exec jekyll serve
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;注意，如果没有前面创建的 Gemfile 文件，这个命令是执行不通过的。&lt;/p&gt;
+
+&lt;p&gt;下面，就可以使用 Jekyll 啦，本地测试在浏览器输入 http://localhost:4000 即可。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;五、学会使用Jekyll个性化博客&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;从零写一个漂亮的博客时间成本太高。更何况，每写一篇博客还要重复大量以往的工作，既耗时又耗力。为美化博客且最大限度的实现代码复用，我们充分发挥拿来主义精神，它山之石可以攻玉。&lt;/p&gt;
+
+&lt;p&gt;浏览器中登录 GitHub 网站，进入自己的 liclong.github.io 仓库（再次强调，&lt;em&gt;liclong&lt;/em&gt;是我的用户名，大家在实际操作是将它改成自己的用户名）。&lt;/p&gt;
+
+&lt;p&gt;随后，进入 liclong.github.io 仓库，并点击菜单栏中的 Settings。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-theme.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;在 theme 中，选择你喜欢的主题。这里我们以 slate 主题为例，如下图所示。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-slate.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;可以查看它在 GitHub 中的代码，并 git clone 到本地。现在将里面的代码全部复制到本地的 liclong.git.io 目录，文件名重复的直接 replace。然后，进入 liclong.github.io 目录，并执行：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git add .     //多个文件修改时，可以直接用.的方式实现全选
+$ git push      //推送到 GitHub
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;打开浏览器，登录 http://liclong.github.io，你会看到 slate 主题的网页里。修改 index.html 文件即可进行修改。具体细节可实际摸索。&lt;/p&gt;
+
+&lt;p&gt;注意，目前的 GitHub 进行了改版，以前各教程中提到的 theme 中的 “automatic page generator” 已经不在，大家不必纠结。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-answer.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;结语&quot;&gt;结语&lt;/h2&gt;
+
+&lt;p&gt;楼长，04月于苏州。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;em&gt;注：在笔者撰文期间，Google 在 Google China Developers Days 上宣布了 developers.google.cn 域名的启用，方便国内开发者访问。对于文中所有链向 developers.google.com 的参考文献，应该都可以在 cn 站点中找到。&lt;/em&gt;&lt;/p&gt;
+
+</description>
+        <pubDate>Mon, 10 Apr 2017 05:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2017/04/10/the-first-blog/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/04/10/the-first-blog/</guid>
+        
+        <category>前端开发</category>
+        
+        <category>JavaScript</category>
+        
+        
+      </item>
+    
+  </channel>
+</rss>

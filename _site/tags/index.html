@@ -10,7 +10,7 @@
     <meta name="keywords"  content="Coop, 云计算, ChrisLi, 极客, @liclong, 楼长de博客, Chris‘ Blog, 互联网, 设计, 产品，USTC, UCLA, 智慧城市">
     <meta name="theme-color" content="#000000">
     
-    <title>来自COOP楼长的博客 | Chris' Blog</title>
+    <title>Tags - 来自COOP楼长的博客 | Chris' Blog</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/">
+    <link rel="canonical" href="http://localhost:4000/tags/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -150,14 +150,13 @@
 
 
     <!-- Page Header -->
-<header class="intro-header" style="background-image: url('/img/home-bg-o.jpg')">
+<header class="intro-header" style="background-image: url('/img/tag-bg.jpg')">
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
-                <div class="site-heading">
-                    <h1>Chris' Blog</h1>
-                    <!--<hr class="small">-->
-                    <span class="subheading">来自COOP楼长的博客</span>
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="site-heading" id="tag-heading">
+                    <h1>Tags</h1>
+                    <span class="subheading">keep hungry keep foolish</span>
                 </div>
             </div>
         </div>
@@ -167,142 +166,79 @@
 <!-- Main Content -->
 <div class="container">
 	<div class="row">
-        
+		<div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+            <!-- 标签云 -->
+			<div id='tag_cloud' class="tags">
+				
+				<a href="#前端开发" title="前端开发" rel="1">前端开发</a>
+				
+				<a href="#JavaScript" title="JavaScript" rel="1">JavaScript</a>
+				
+			</div>
 
-<!-- USE SIDEBAR -->
-    <!-- PostList Container -->
-    		<div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                postlist-container
-            ">
-    			
-<div class="post-preview">
-    <a href="/2017/04/10/the-first-blog/">
-        <h2 class="post-title">
-            Hey, 这是我的第一篇GitHub博客
-        </h2>
-        
-        <h3 class="post-subtitle">
-            If you can quit, then quit. If you cannot quit, your are a writer. - R.A.Salvatore
-        </h3>
-        
-        <div class="post-content-preview">
-            为什么写博客
-关于“为什么写博客”，这其实是个和“博客”一样古老的话题，一百个人能拿出一千个截然不同的理由来回答，联系度娘还能问出更多。而我蹩脚的选择在博客时代早就过去的现在开始动笔（貌似微博的热潮也消退了），除了本人比较慢热以及反应迟钝外，也是基于个人的一些经历和教训。这里希望分享出来可供大家参考。
+            <!--<blockquote class="tag-comments">
+                标签命名规范：
+                    <li>行业观察、职位、公司优先使用中文</li>
+                    <li>外国产品、术语优先使用英文</li>
+            </blockquote>-->
 
-一、好记性不如烂笔头
+            <!-- 标签列表 -->
+			
+			<div class="one-tag-list">
+			  	<span class="fa fa-tag listing-seperator" id="前端开发">
+                    <span class="tag-text">前端开发</span>
+                </span>
+				
+				  <!-- <li class="listing-item">
+				  <time datetime="2017-04-10">2017-04-10</time>
+				  <a href="/2017/04/10/the-first-blog/" title="Hey, 这是我的第一篇GitHub博客">Hey, 这是我的第一篇GitHub博客</a>
+				  </li> -->
+				 <div class="post-preview">
+				    <a href="/2017/04/10/the-first-blog/">
+				        <h2 class="post-title">
+                            Hey, 这是我的第一篇GitHub博客
+				        </h2>
+				        
+				        <h3 class="post-subtitle">
+				            If you can quit, then quit. If you cannot quit, your are a writer. - R.A.Salvatore
+				        </h3>
+				        
+				    </a>
+				    <!-- <p class="post-meta">2017-04-10</p> -->
+				</div>
+				<hr>
+				
+			</div>
+			
+			<div class="one-tag-list">
+			  	<span class="fa fa-tag listing-seperator" id="JavaScript">
+                    <span class="tag-text">JavaScript</span>
+                </span>
+				
+				  <!-- <li class="listing-item">
+				  <time datetime="2017-04-10">2017-04-10</time>
+				  <a href="/2017/04/10/the-first-blog/" title="Hey, 这是我的第一篇GitHub博客">Hey, 这是我的第一篇GitHub博客</a>
+				  </li> -->
+				 <div class="post-preview">
+				    <a href="/2017/04/10/the-first-blog/">
+				        <h2 class="post-title">
+                            Hey, 这是我的第一篇GitHub博客
+				        </h2>
+				        
+				        <h3 class="post-subtitle">
+				            If you can quit, then quit. If you cannot quit, your are a writer. - R.A.Salvatore
+				        </h3>
+				        
+				    </a>
+				    <!-- <p class="post-meta">2017-04-10</p> -->
+				</div>
+				<hr>
+				
+			</div>
+			
 
-之前在学校零零星星参与过一些项目，但遗憾的是，随着时间的推移，稍...
-        </div>
-    </a>
-    <p class="post-meta">
-        Posted by Chris on April 10, 2017
-    </p>
-</div>
-<hr>
-
-
-<!-- Pager -->
-
-
-    		</div>
-    <!-- Sidebar Container -->
-            <div class="
-                col-lg-3 col-lg-offset-0
-                col-md-3 col-md-offset-0
-                col-sm-12
-                col-xs-12
-                sidebar-container
-            ">
-            
-                <!-- Featured Tags -->
-                <!--
-                
-                <section>
-                    <hr class="hidden-sm hidden-xs">
-                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-                    <div class="tags">
-                        
-                            
-                        
-                            
-                        
-                    </div>
-                </section>
-                
-                 -->
-
-                <!-- Short About -->
-                <section class="visible-md visible-lg">
-                    <hr><h5><a href="/about/">ABOUT ME</a></h5>
-                    <div class="short-about">
-                        
-                            <img src="/img/wechat-id.jpeg" />
-                        
-                        
-                            <p>Stay foolish, Stay hungry!<br>这里是楼长的博客，与你一起发现更远的世界。</p>
-                        
-                        <!-- SNS Link -->
-                        <ul class="list-inline">
-                            
-                            
-                            
-                            <li>
-                                <a target="_blank" href="http://weibo.com/来自COOP的楼长">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://www.facebook.com/100010765389727">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://github.com/liclong">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://www.linkedin.com/in/changlong-li-272a1bba">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                </section>
-                
-    		</div>
-        
+		</div>
 	</div>
-</div>
-
-<hr style="filter: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color="#987cb9" size="3">
-<div style="text-align:center;">
-    <span id="busuanzi_container_site_pv">
-        本站总访问量<span id="busuanzi_value_site_pv"></span>次
-    </span>
 </div>
 
 
