@@ -5,8 +5,8 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 14 Apr 2017 02:04:32 -0700</pubDate>
-    <lastBuildDate>Fri, 14 Apr 2017 02:04:32 -0700</lastBuildDate>
+    <pubDate>Sat, 15 Apr 2017 03:41:38 -0700</pubDate>
+    <lastBuildDate>Sat, 15 Apr 2017 03:41:38 -0700</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -130,11 +130,10 @@ $ git config --global user.email &quot;youemail@gmail.com&quot;
 
 &lt;p&gt;随后，将修改的文件同步回 GitHub。现在我们看一下如何将修改的东西同步回去。&lt;/p&gt;
 
-&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git status            //查看仓库中文件修改状况
-
-$ git add index.html    //将文件加入暂存区
-
-$ git push              //现在，GitHub 上的仓库被更新了
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ git status                //查看仓库中文件修改状况
+$ git add index.html        //将文件加入暂存区
+$ git commit -m &quot;the content of update&quot;
+$ git push                  //现在，GitHub 上的仓库被更新了
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 

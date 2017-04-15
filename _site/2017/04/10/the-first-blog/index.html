@@ -324,11 +324,10 @@ $ git config --global user.email "youemail@gmail.com"
 
 <p>随后，将修改的文件同步回 GitHub。现在我们看一下如何将修改的东西同步回去。</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ git status            //查看仓库中文件修改状况
-
-$ git add index.html    //将文件加入暂存区
-
-$ git push              //现在，GitHub 上的仓库被更新了
+<div class="highlighter-rouge"><pre class="highlight"><code>$ git status                //查看仓库中文件修改状况
+$ git add index.html        //将文件加入暂存区
+$ git commit -m "the content of update"
+$ git push                  //现在，GitHub 上的仓库被更新了
 </code></pre>
 </div>
 
@@ -773,7 +772,7 @@ $ git push          //推送到 GitHub
 
 
 <!-- Image to hack wechat -->
-<img src="/img/icon_wechat.png" width="0" height="0" />
+<!--<img src="/img/icon_wechat.png" width="0" height="0" />-->
 <!-- Migrate from head to bottom, no longer block render and still work -->
 
 </body>
