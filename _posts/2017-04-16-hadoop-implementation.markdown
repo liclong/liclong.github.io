@@ -469,7 +469,7 @@ Namenode 正常启动,但子节点的 datanode 无法正常启动
 
 1.&nbsp;安装 JDK 环境
 
-注意，这里安装的 JDK 要和集群上的版本保持一致。下载地址：<http://www.oracle.com/technetwork/java/javase/downloads/index.html>
+注意，这里安装的 JDK 要和集群上的版本保持一致。
 
 2.&nbsp;安装 Eclipse
 
