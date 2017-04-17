@@ -5,15 +5,542 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Sat, 15 Apr 2017 07:36:54 -0700</pubDate>
-    <lastBuildDate>Sat, 15 Apr 2017 07:36:54 -0700</lastBuildDate>
+    <pubDate>Mon, 17 Apr 2017 00:12:17 -0700</pubDate>
+    <lastBuildDate>Mon, 17 Apr 2017 00:12:17 -0700</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>「51CTO」Hadoop平台与开发环境搭建</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;文章转自我在 51CTO 的一篇网络课程，如下是楼长 2014 年录的一段操作视频，可供大家参考。（优酷的广告可真长…）&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;embed src=&quot;http://player.youku.com/player.php/sid/XMjcxMjg2MjU2OA==/v.swf&quot; allowfullscreen=&quot;true&quot; quality=&quot;high&quot; width=&quot;690&quot; height=&quot;320&quot; align=&quot;middle&quot; allowscriptaccess=&quot;always&quot; type=&quot;application/x-shockwave-flash&quot; /&gt;
+
+&lt;h2 id=&quot;准备工作&quot;&gt;准备工作&lt;/h2&gt;
+
+&lt;p&gt;1. 集群安装 ubuntu 系统，用户名：hadoop，密码自设。&lt;/p&gt;
+
+&lt;p&gt;2. 使用 &lt;b&gt;$ifconfig&lt;/b&gt; 命令查看网络信息，并据此将 IP 等设置为静态。集群相应网络参数如下表，这里我们使用了三台 Linux 来部署Hadoop。&lt;/p&gt;
+
+&lt;table&gt;
+  &lt;thead&gt;
+    &lt;tr&gt;
+      &lt;th&gt;Host Name&lt;/th&gt;
+      &lt;th&gt;User Name&lt;/th&gt;
+      &lt;th&gt;IP Address&lt;/th&gt;
+    &lt;/tr&gt;
+  &lt;/thead&gt;
+  &lt;tbody&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Master&lt;/td&gt;
+      &lt;td&gt;hadoop&lt;/td&gt;
+      &lt;td&gt;10.0.1.27&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Slave_one&lt;/td&gt;
+      &lt;td&gt;hadoop&lt;/td&gt;
+      &lt;td&gt;10.0.1.27&lt;/td&gt;
+    &lt;/tr&gt;
+    &lt;tr&gt;
+      &lt;td&gt;Slave_two&lt;/td&gt;
+      &lt;td&gt;hadoop&lt;/td&gt;
+      &lt;td&gt;10.0.1.27&lt;/td&gt;
+    &lt;/tr&gt;
+  &lt;/tbody&gt;
+&lt;/table&gt;
+
+&lt;p&gt;3. 实现 ssh 服务，命令：&lt;b&gt;$sudo apt-get install openssh-server&lt;/b&gt;（不需要重启）。&lt;/p&gt;
+
+&lt;p&gt;4. 使用命令：&lt;b&gt;$ssh hadoop@10.0.1.27&lt;/b&gt; 测试服务连接是否正常。&lt;/p&gt;
+
+&lt;p&gt;5. 设置无密钥登录&lt;/p&gt;
+
+&lt;p&gt;各节点生成密钥：&lt;b&gt;$ssh-keygen&lt;/b&gt;，之后会在 /home/hadoop/ 路径下生成 .ssh 文件夹；&lt;/p&gt;
+
+&lt;p&gt;将各节点的 id_rsa.pub 文件集中到 Master：&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$scp ~/.ssh/id_rsa.pub hadoop@10.0.1.27:/home/hadoop/keygen/&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;将各节点 id_rsa.pub 中的内容追加到authorized_keys文件：&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$cat id_rsa.pub » ../.ssh/authorized_keys&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;随后，将 authorized_keys 文件分发到各个节点：&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$scp ~/.ssh/authorized_keys hadoop@10.0.1.27:/home/hadoop/.ssh/
+&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;如此,就实现了各节点间的无密钥登录。注意:无密钥登录是集群正常运行的必要条件&lt;/p&gt;
+
+&lt;p&gt;6. 设置 hostname (Master, Slave_one, Slave_two),执行命令：&lt;b&gt;$sudo vim /etc/hosts&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;7. 手动配置 JDK&lt;/p&gt;
+
+&lt;p&gt;为了进行版本控制，这里我们手动安装 JDK。将文件夹 jdk1.7.0-40 上传到服务器各节点：&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$./auto_sync_simple.sh jdk1.7.0_40 /home/hadoop/Cloud/&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;这里，auto_sync_simple.sh 是自己写的分发脚本，大家也可以命令行直接分发。&lt;/p&gt;
+
+&lt;p&gt;接着，打开 /etc/profile 文件，追加如下信息：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-jason&quot;&gt;export JAVA_HOME=/home/hadoop/Cloud/jdk1.7.0_40
+export CLASSPATH=$CLASSPATH:$JAVA_HOME/lib:$JAVA_HOME/jre/lib 
+export PATH=$JAVA_HOME/bin:$JAVA_HOME/jre/bin:$PATH:$HOME/bin
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;执行命令&lt;b&gt;$. /etc/profile&lt;/b&gt; 使环境变量即时生效&lt;/p&gt;
+
+&lt;p&gt;每个节点均如此设置,可使用 &lt;b&gt;$java -version&lt;/b&gt; 命令进行验证&lt;/p&gt;
+
+&lt;p&gt;8. 关闭防火墙&lt;/p&gt;
+
+&lt;p&gt;ubuntu 系统默认 iptables 是关闭的，通过命令 &lt;b&gt;$sudo ufw status&lt;/b&gt; 可查看状态&lt;/p&gt;
+
+&lt;p&gt;关闭 SELinux: &lt;b&gt;$setenforce 0&lt;/b&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;部署-hadoop&quot;&gt;部署 Hadoop&lt;/h2&gt;
+
+&lt;p&gt;1. Hadoop目录结构&lt;/p&gt;
+
+&lt;p&gt;Hadoop-2.0 以后版本较之前有较大改动&lt;/p&gt;
+
+&lt;p&gt;由于使用 hadoop 的用户被分成了不同的用户组,就像 Linux 一样。因此执行文件和脚本被分成了
+两部分,分别存放在 bin 和 sbin 目录下。&lt;/p&gt;
+
+&lt;p&gt;存放在 sbin 目录下的是只有超级用户才有权限执行的脚本, 如 start-dfs.sh, start-yarn.sh, stop-dfs.sh, stop-yarn.sh 等,这些是对整个集群的操作,只有 superuser 才有权限。&lt;/p&gt;
+
+&lt;p&gt;存放在 bin 目录下的脚本所有的用户都有执行的权限,这里的脚本一般都是 对集群中具体的文件或者 block pool 操作的命令,如上传文件,查看集群的使用情况等&lt;/p&gt;
+
+&lt;p&gt;etc 目录下存放的就是在 0.23.0 版本以前 conf 目录下存放的东西,就是对 common, hdfs, mapreduce(yarn)的配置信息&lt;/p&gt;
+
+&lt;p&gt;include 和 lib 目录下存放的是使用 Hadoop 的 C 语言接口开发用到的头文件和链接的库&lt;/p&gt;
+
+&lt;p&gt;libexec 目录下存放的是 hadoop 的配置脚本,具体怎么用到的这些脚本,我也还没跟踪到。目前 我就是在其中 hadoop-config.sh 文件中增加了 JAVA_HOME 环境变量&lt;/p&gt;
+
+&lt;p&gt;logs 目录在 download 到的安装包里是没有的,如果你安装并运行了 hadoop,就会生成 logs 这 个目录和里面的日志&lt;/p&gt;
+
+&lt;p&gt;share 这个文件夹存放的是 doc 文档和最重要的 Hadoop 源代码编译生成的 jar 包文件,就是运行 hadoop 所用到的所有的 jar 包&lt;/p&gt;
+
+&lt;p&gt;2. 从 Apache 官网可以下载最新版，本文采用的是 2.2.0，&lt;a href=&quot;http://hadoop.apache.org/ &quot;&gt;http://hadoop.apache.org/ &lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;3. 在服务器各节点新建 Cloud 目录，注意，各节点 Hadoop 保存的路径需要一致。&lt;/p&gt;
+
+&lt;p&gt;4. 将从官网下载的 hadoop-2.2.0.tar.gz 上传到服务器&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$scp Downloads/hadoop-2.2.0.tar.gz hadoop@10.0.1.27:/home/hadoop/Cloud/&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;解压文件：&lt;b&gt;$tar -zxvf hadoop-2.2.0.tar.gz hadoop-2.2.0&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;5. 如下文件需要配置&lt;/p&gt;
+
+&lt;p&gt;*core-site.xml, *mapred-site.xml, *hdfs-site.xml, *yarn-site.xml, *masters, *slaves&lt;/p&gt;
+
+&lt;p&gt;6. 编辑~/.bashrc 文件，加入如下内容&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-jason&quot;&gt;export HADOOP_PREFIX=&quot;/home/hadoop/Cloud/hadoop-2.2.0&quot; 
+export PATH=$PATH:$HADOOP_PREFIX/bin
+export PATH=$PATH:$HADOOP_PREFIX/sbin
+export HADOOP_MAPRED_HOME=${HADOOP_PREFIX} 
+export HADOOP_COMMON_HOME=${HADOOP_PREFIX} 
+export HADOOP_HDFS_HOME=${HADOOP_PREFIX}
+export YARN_HOME=${HADOOP_PREFIX}
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;保存退出，然后执行&lt;b&gt;$source ~/.bashrc&lt;/b&gt; 使之即时生效&lt;/p&gt;
+
+&lt;p&gt;7. 在 etc/hadoop 目录中依次编辑如上所述配置文件，若未找到 mapred-site.xml 文件可自行创建，其中 core-site.xml、mapred-site.xml、hdfs-site.xml、yarn-site.xml 为配置文件，需要着重配置，各文件配置内容如下所示:&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;(1) core-site.xml&lt;/b&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;io.native.lib.avaliable&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;fs.default.name&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;hdfs://mcmaster:9000&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;final&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/final&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;hadoop.tmp.dir&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;/home/hadoop/Cloud/workspace/tmp&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;b&gt;(2) hdfs-site.xml&lt;/b&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;dfs.replication&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;3&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;dfs.permissions&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;false&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;dfs.namenode.name.dir&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;/home/hadoop/Cloud/workspace/hdfs/data&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;final&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/final&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;dfs.namenode.dir&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;/home/hadoop/Cloud/workspace/hdfs/name&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;dfs.datanode.dir&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;/home/hadoop/Cloud/workspace/hdfs/data&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;dfs.webhdfs.enabled&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;b&gt;(3) mapred-site.xml&lt;/b&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.framework.name&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;yarn&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt; 
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.job.tracker&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;hdfs://mcmaster:9001&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;final&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/final&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt; 
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.map.memory.mb&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;1536&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt; 
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.map.java.opts&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;-Xmx1024M&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt; 
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.reduce.memory.mb&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;3072&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt; 
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.reduce.java.opts&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;-Xmx2560M&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.task.io.sort.mb&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;512&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt; 
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.task.io.sort.factor&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;100&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt; 
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapreduce.reduce.shuffle.parallelcopies&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;50&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt; 
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapred.system.dir&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;/home/hadoop/Cloud/workspace/mapred/system&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;final&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/final&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt; 
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;mapred.local.dir&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;/home/hadoop/Cloud/workspace/mapred/local&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;final&amp;gt;&lt;/span&gt;true&lt;span class=&quot;nt&quot;&gt;&amp;lt;/final&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;b&gt;(4) yarn-site.xml&lt;/b&gt;&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;yarn.resourcemanager.address&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;mcmaster:8080&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;yarn.resourcemanager.scheduler.address&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;mcmaster:8081&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;yarn.resourcemanager.resource-tracker.address&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;mcmaster:8082&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;yarn.nodemanager.aux-services&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;mapreduce_shuffle&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt; 
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt;yarn.nodemanager.aux-services.mapreduce.shuffle.class&lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt;org.apache.hadoop.mapred.ShuffleHandler&lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;8. 在 etc/hadoop 目录下的 hadoop-env.sh 中添加如下内容，另需 yarn-env.sh 中填充相同的内容。&lt;/p&gt;
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;export HADOOP_FREFIX=/home/hadoop/Cloud/hadoop-2.2.0 
+export HADOOP_COMMON_HOME=${HADOOP_FREFIX} 
+export HADOOP_HDFS_HOME=${HADOOP_FREFIX}
+export PATH=$PATH:$HADOOP_FREFIX/bin
+export PATH=$PATH:$HADOOP_FREFIX/sbin
+export HADOOP_MAPRED_HOME=${HADOOP_FREFIX}
+export YARN_HOME=${HADOOP_FREFIX}
+export HADOOP_CONF_HOME=${HADOOP_FREFIX}/etc/hadoop 
+export YARN_CONF_DIR=${HADOOP_FREFIX}/etc/hadoop 
+export JAVA_HOME=/usr/lib/jvm/java-7-sun
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;9. 编写分发脚本，将配置完成的 hadoop 分发的所有节点&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$./auto_sync_simple.sh /home/hadoop/Cloud/hadoop-2.2.0 /home/hadoop/Cloud/&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;10. 跳转到 hadoop 根目录下，格式化 namenode，随后启动集群&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$bin/hdfs namenode -format sbin/start-all.sh&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;11. 登录 10.0.1.27:8080 可查看资源管理页面&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-login.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;运行示例程序&quot;&gt;运行示例程序&lt;/h2&gt;
+
+&lt;p&gt;WordCount 是最简单也是最能体现 MapReduce 思想的程序之一，可以称为 MapReduce 版 “Hello World”，该程序的完整代码可以在 Hadoop 安装包的 “src/examples” 目录下找到。&lt;/p&gt;
+
+&lt;p&gt;WordCount主要功能是：统计一系列文本文件中每个单词出现的次数。&lt;/p&gt;
+
+&lt;p&gt;1. 创建本地示例文件&lt;/p&gt;
+
+&lt;p&gt;在/home/hadoop/Cloud/hadoop-2.2.0 目录下创建示例文件 test1.txt 和 test2.txt&lt;/p&gt;
+
+&lt;p&gt;2. 在 HDFS 上创建输入文件 &lt;b&gt;$bin/hadoop fs -mkdir /input&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;3. 上传本地文件到 HDFS 的 input 目录&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$bin/hadoop fs -put test1.txt /input&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$bin/hadoop fs -put test2.txt /input&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;4. 运行 WordCount&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$bin/hadoop jar /share/hadoop/mapreduce/hadoop-mapreduce-examples-2.2.0.jar wordcount
+/input /output&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;若正常执行则说明集群搭建成功!&lt;/p&gt;
+
+&lt;h2 id=&quot;常见问题及解决方案&quot;&gt;常见问题及解决方案&lt;/h2&gt;
+
+&lt;p&gt;1. 日志报错：&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;java.lang.IllegalArgumentException: The ServiceName: mapreduce.shuffle set in
+yarn.nodemanager.aux-services is invalid.The valid service name should only contain a-zA-Z0-9&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;解决方法：新版本 Hadoop 的配置名有所修改，将如下配置&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt; yarn.nodemanager.aux-services &lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt; mapreduce.shuffle &lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;改为&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;property&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;name&amp;gt;&lt;/span&gt; yarn.nodemanager.aux-services &lt;span class=&quot;nt&quot;&gt;&amp;lt;/name&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;value&amp;gt;&lt;/span&gt; mapreduce_shuffle &lt;span class=&quot;nt&quot;&gt;&amp;lt;/value&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/property&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;2. 日志报错：&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;Hadoop 2.2.0 - warning: You have loaded library /home/hadoop/2.2.0/lib/native/libhadoop.so.1.0.0
+which might have disabled stack guard&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;解决方法: 由于 Hadoop 2.2.0 默认配置的 libhadoop 是32位的，在64位的操作系统环境运行过程中，会提示如上错误
+需要重新编译 Hadoop 源码,得到适合的库文件,请按以下步骤执行。&lt;/p&gt;
+
+&lt;p&gt;(1) 配置编译环境&lt;/p&gt;
+
+&lt;p&gt;本文采用 Ubuntu 14.04 系统，首先安装编译环境&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$ sudo apt-get install build-essential&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$ sudo apt-get install g++ autoconf automake libtool cmake zlib1g-dev pkg- config libssl-dev&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$ sudo apt-get install maven&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;(2) 配置 protobuf&lt;/p&gt;
+
+&lt;p&gt;编译过程需要使用 protobuf，建议先行安装。截至撰文，Ubuntu 仓库默认的 protobuf 是 2.4.1 版,需要更新的
+2.5 版。可从 &lt;a href=&quot;https://github.com/google/protobuf&quot;&gt;https://github.com/google/protobuf&lt;/a&gt; 下载。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$ ./configure –prefix=/usr&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$make&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$sudo make install&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;可通过 &lt;b&gt;echo $?&lt;/b&gt; 命令查看是否 make 成功，返回 0 则通过。&lt;/p&gt;
+
+&lt;p&gt;(3) 编译 Hadoop&lt;/p&gt;
+
+&lt;p&gt;解压进入 hadoop 源码目录,执行编译&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$ mvn package -Pdist,native -DskipTests -Dtar&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;若安装成功，系统会提示如下信息：&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-jason&quot;&gt;1. [INFO] BUILD SUCCESS
+2. [INFO] ------------------------------------------------
+3. [INFO] Total time: 15:39.705s
+4. [INFO] Finished at: Fri Nov 01 14:36:17 CST 2014
+5. [INFO] Final Memory: 135M/422M
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;然后，在以下目录可以获取编译完成的 libhadoop:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;1. hadoop-2.2.0-src/hadoop-dist/target/hadoop-2.2.0/lib
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;将编译的 lib/native 文件夹替换原本的即可。&lt;/p&gt;
+
+&lt;p&gt;注意：在 mvn hadoop-2.4.0 时一切正常，但编译 hadoop-2.2.0 版本时报如下错误&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-jason&quot;&gt;[ERROR] COMPILATION ERROR :
+[INFO] -------------------------------------------------------------
+[ERROR] /home/hduser/code/hadoop-2.2.0-src/hadoop-common-project/hadoop-
+auth/src/test/java/org/apache/hadoop/security/authentication/client/AuthenticatorTestCase.java:[88
+,11] error: cannot access AbstractLifeCycle
+[ERROR] class file for org.mortbay.component.AbstractLifeCycle not found
+/home/hduser/code/hadoop-2.2.0-src/hadoop-common-project/hadoop-
+auth/src/test/java/org/apache/hadoop/security/authentication/client/AuthenticatorTestCase.java:[96
+,29] error: cannot access LifeCycle
+[ERROR] class file for org.mortbay.component.LifeCycle not found
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;此时，需编辑 hadoop-common-project/hadoop-auth/pom.xml 文件，添加依赖&lt;/p&gt;
+
+&lt;div class=&quot;language-html highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nt&quot;&gt;&amp;lt;dependency&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;groupId&amp;gt;&lt;/span&gt;org.mortbay.jetty&lt;span class=&quot;nt&quot;&gt;&amp;lt;/groupId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;artifactId&amp;gt;&lt;/span&gt;jetty-util&lt;span class=&quot;nt&quot;&gt;&amp;lt;/artifactId&amp;gt;&lt;/span&gt;
+    &lt;span class=&quot;nt&quot;&gt;&amp;lt;scope&amp;gt;&lt;/span&gt;test&lt;span class=&quot;nt&quot;&gt;&amp;lt;/scope&amp;gt;&lt;/span&gt;
+&lt;span class=&quot;nt&quot;&gt;&amp;lt;/dependency&amp;gt;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;再次编译，这个错误解决了。&lt;/p&gt;
+
+&lt;p&gt;3. 错误现象：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;WARN hdfs.DFSClient: DataStreamer Exception 
+org.apache.hadoop.ipc.RemoteException(java.io.IOException):File /tmp/pg20417.txt._COPYING_ could only be replicated to 0 nodes instead ofminReplication (=1). 
+There are 0 datanode(s) running and no node(s) are excluded in this operation.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;发生地方:执行 &lt;b&gt;$bin/hdfs dfs –copyFromLocal /home/hadoop/test1.txt /input&lt;/b&gt; 时&lt;/p&gt;
+
+&lt;p&gt;原因定位: 后来经过反复查看,是因为 fs.default.name 的值中的 IP 地址配置成了 localhost，导致系统找不到 hdfs，是在 datanode 的日志中发现这个错误的&lt;/p&gt;
+
+&lt;p&gt;4. 错误现象：&lt;/p&gt;
+
+&lt;p&gt;Namenode 正常启动,但子节点的 datanode 无法正常启动&lt;/p&gt;
+
+&lt;p&gt;原因定位:Hadoop 文件系统格式不符，将所有子节点中的/home/hadoop/Cloud/workspace 目录删除，然后格式化 hdfs 并重启集群即可。&lt;/p&gt;
+
+&lt;p&gt;5. 错误现象：&lt;/p&gt;
+
+&lt;p&gt;提交任务时卡住,MapReduce 无法正常执行&lt;/p&gt;
+
+&lt;p&gt;原因定位:这个问题纠结了两天,网上各种查,最后发现是 yarn-site.xml 文件中参数名: yarn.resoucemanager.scheduler.address 漏写了一个字母,无限捶胸顿足,希望大家引以为戒。&lt;/p&gt;
+
+&lt;h2 id=&quot;开发环境搭建&quot;&gt;开发环境搭建&lt;/h2&gt;
+
+&lt;p&gt;这里在 Windows 下搭建开发环境，在基于 Ubuntu 的集群上运行，架构如图所示。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-os.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;1. 安装 JDK 环境&lt;/p&gt;
+
+&lt;p&gt;注意，这里安装的 JDK 要和集群上的版本保持一致。下载地址：&lt;a href=&quot;http://www.oracle.com/technetwork/java/javase/downloads/index.html&quot;&gt;http://www.oracle.com/technetwork/java/javase/downloads/index.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;2. 安装 Eclipse&lt;/p&gt;
+
+&lt;p&gt;这里楼长用 Eclipse 作为示例，下载地址：&lt;a href=&quot;http://www.eclipse.org/downloads/&quot;&gt;http://www.eclipse.org/downloads/&lt;/a&gt;。感兴趣的童鞋也可以尝试 IntelliJ，一个很不错的 IDE。&lt;/p&gt;
+
+&lt;p&gt;3. 新建工程&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-new-project.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;4. 新建 package&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-new-package.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;5. 导入 jar 包&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-import.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;6. 编写代码&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-coding.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;7. 编译程序&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-export1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;8. 导出程序&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-export2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;9. 将 jar 包复制到 Master 节点，跳转到 Master 的 Hadoop 目录，执行：&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;$bin/hadoop jar ~/Cloud/WordCount.jar /input /output&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;以上。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+</description>
+        <pubDate>Sun, 16 Apr 2017 05:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2017/04/16/hadoop-implementation/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/04/16/hadoop-implementation/</guid>
+        
+        <category>Big Data</category>
+        
+        <category>MapReduce</category>
+        
+        
+      </item>
     
       <item>
         <title>Hey, 这是我的第一篇GitHub博客</title>
         <description>&lt;h2 id=&quot;为什么写博客&quot;&gt;为什么写博客&lt;/h2&gt;
 
-&lt;p&gt;关于“为什么写博客”，这其实是和“博客”同样古老的话题，一百个人能给出一千个理由来。这里楼长仅仅抛砖引玉陈列一些个人教训，希望走过类似弯路的童鞋有所共鸣。同时推荐大家参考菜头的《&lt;a href=&quot;http://www.jianshu.com/p/25de264a79cb&quot;&gt;开始写作吧&lt;/a&gt;》，刘未鹏的《&lt;a href=&quot;https://www.douban.com/note/530583920/&quot;&gt;为什么你应该（从现在开始就）写博客&lt;/a&gt;》，李笑来的《&lt;a href=&quot;http://garrolan.blogspot.com/2017/03/app33.html&quot;&gt;为什么你一定要学会写作&lt;/a&gt;》，以及 Joshua Becker 的《&lt;a href=&quot;http://www.becomingminimalist.com/15-reasons-i-think-you-should-blog/&quot;&gt;Why you should write blog&lt;/a&gt;》。&lt;/p&gt;
+&lt;p&gt;关于“为什么写博客”，这其实是和“博客”同样古老的话题，一百个人能给出一千个理由来。这里楼长仅仅抛砖引玉陈列一些个人教训，希望走过类似弯路的童鞋有所共鸣。同时推荐大家参考和菜头的《&lt;a href=&quot;http://www.jianshu.com/p/25de264a79cb&quot;&gt;开始写作吧&lt;/a&gt;》，刘未鹏的《&lt;a href=&quot;https://www.douban.com/note/530583920/&quot;&gt;为什么你应该（从现在开始就）写博客&lt;/a&gt;》，李笑来的《&lt;a href=&quot;http://garrolan.blogspot.com/2017/03/app33.html&quot;&gt;为什么你一定要学会写作&lt;/a&gt;》，以及 Joshua Becker 的《&lt;a href=&quot;http://www.becomingminimalist.com/15-reasons-i-think-you-should-blog/&quot;&gt;Why you should write blog&lt;/a&gt;》。&lt;/p&gt;
 
 &lt;p&gt;&lt;b&gt;一、好记性不如烂笔头&lt;/b&gt;&lt;/p&gt;
 
