@@ -12,11 +12,9 @@ tags:
     - MapReduce
 ---
 
-> 文章转自我在 51CTO 的一篇网络课程，如下是楼长 2014 年录的一段操作视频，可供大家参考。（优酷的广告可真长...）
+> 文章转自我在 51CTO 的一篇网络课程，如下是楼长 2014 年录的一段操作视频，供大家参考。
 
-<embed src='http://player.youku.com/player.php/sid/XMjcxMjg2MjU2OA==/v.swf' allowFullScreen='true' quality='high' width='690' height='320' align='middle' allowScriptAccess='always' type='application/x-shockwave-flash'/>
-
-<iframe height=498 width=510 src='http://player.youku.com/embed/XMjcxMjg2MjU2OA==' frameborder=0 'allowfullscreen'></iframe>
+[![](/img/2017-04-16-hadoop-implementation/hadoop-video.png)][1]
 
 ## 准备工作
 
@@ -508,4 +506,6 @@ Namenode 正常启动,但子节点的 datanode 无法正常启动
 以上。
 
 ---
+
+[1]: https://pan.baidu.com/s/1jI9htgq
 

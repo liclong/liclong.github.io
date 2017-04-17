@@ -5,17 +5,17 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 17 Apr 2017 00:19:26 -0700</pubDate>
-    <lastBuildDate>Mon, 17 Apr 2017 00:19:26 -0700</lastBuildDate>
+    <pubDate>Mon, 17 Apr 2017 00:52:09 -0700</pubDate>
+    <lastBuildDate>Mon, 17 Apr 2017 00:52:09 -0700</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
         <title>「51CTO」Hadoop平台与开发环境搭建</title>
         <description>&lt;blockquote&gt;
-  &lt;p&gt;文章转自我在 51CTO 的一篇网络课程，如下是楼长 2014 年录的一段操作视频，可供大家参考。（优酷的广告可真长…）&lt;/p&gt;
+  &lt;p&gt;文章转自我在 51CTO 的一篇网络课程，如下是楼长 2014 年录的一段操作视频，供大家参考。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;embed src=&quot;http://player.youku.com/player.php/sid/XMjcxMjg2MjU2OA==/v.swf&quot; allowfullscreen=&quot;true&quot; quality=&quot;high&quot; width=&quot;690&quot; height=&quot;320&quot; align=&quot;middle&quot; allowscriptaccess=&quot;always&quot; type=&quot;application/x-shockwave-flash&quot; /&gt;
+&lt;p&gt;&lt;a href=&quot;https://pan.baidu.com/s/1jI9htgq&quot;&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-video.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;准备工作&quot;&gt;准备工作&lt;/h2&gt;
 
