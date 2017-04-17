@@ -16,6 +16,8 @@ tags:
 
 <embed src='http://player.youku.com/player.php/sid/XMjcxMjg2MjU2OA==/v.swf' allowFullScreen='true' quality='high' width='690' height='320' align='middle' allowScriptAccess='always' type='application/x-shockwave-flash'/>
 
+<iframe height=498 width=510 src='http://player.youku.com/embed/XMjcxMjg2MjU2OA==' frameborder=0 'allowfullscreen'></iframe>
+
 ## 准备工作
 
 1.&nbsp;集群安装 ubuntu 系统，用户名：hadoop，密码自设。
