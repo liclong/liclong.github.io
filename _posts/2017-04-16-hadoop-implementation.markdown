@@ -25,8 +25,8 @@ tags:
 | Host Name     | User Name  | IP Address |
 | ------------- |------------| -----------|
 | Master        | hadoop     | 10.0.1.27  |
-| Slave_one     | hadoop     | 10.0.1.27  |
-| Slave_two     | hadoop     | 10.0.1.27  |
+| Slave_one     | hadoop     | 10.0.1.39  |
+| Slave_two     | hadoop     | 10.0.1.40  |
 
 3.&nbsp;实现 ssh 服务，命令：<b>$sudo apt-get install openssh-server</b>（不需要重启）。
 
