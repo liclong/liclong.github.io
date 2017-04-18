@@ -2,7 +2,7 @@
 layout:     post
 title:      "Hey, 这是我的第一篇GitHub博客"
 subtitle:   "If you can quit, then quit. If you cannot quit, your are a writer. - R.A.Salvatore"
-date:       2017-04-10 12:00:00
+date:       2017-03-10 12:00:00
 author:     "Chris"
 header-img: "img/home-bg.jpg"
 header-mask: 0.3
