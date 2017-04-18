@@ -164,8 +164,7 @@ chrome 安装好 [switchyomega][6] 后选择 <b>新建情景模式</b>，<b>情�
 
 ![](/img/2017-04-17-shadowsocks/shadowsocks-4.jpeg)
 
-这里，AutoProxy 规则列表地址有所变动，新的地址是:
-<https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt>
+这里，AutoProxy 规则列表地址有所变动，新的地址是: [download][11]
 
 8.&nbsp;然后最关键的一步，在浏览器右上角点击插件按钮，然后选择自动切换规则模式，这样只要在规则列表里面的网站都会翻墻访问。
 
@@ -236,3 +235,4 @@ $sudo apt-get install shadowsocks-qt5
 [8]: https://github.com/FelisCatus/SwitchyOmega/wiki/GFWList
 [9]: https://github.com/shadowsocks/shadowsocks-android/releases
 [10]: https://www.evernote.com/shard/s9/sh/4b3fda4c-866b-4025-987f-8328f28d6d1b/ad5beb3531adb7b7f33b30903fd6b0ff
+[11]: https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt
