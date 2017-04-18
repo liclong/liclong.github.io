@@ -5,9 +5,246 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Mon, 17 Apr 2017 00:52:09 -0700</pubDate>
-    <lastBuildDate>Mon, 17 Apr 2017 00:52:09 -0700</lastBuildDate>
+    <pubDate>Tue, 18 Apr 2017 06:52:58 -0700</pubDate>
+    <lastBuildDate>Tue, 18 Apr 2017 06:52:58 -0700</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>利用 Shadowsocks 观看完整版「人民的名义」</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;最近身边有朋友剧荒了，本着好剧大家看的原则写下此文，以介绍如何登陆 Youtube 继续追剧事业。闲话少说，直接上图：&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-youku.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;基本原理&quot;&gt;基本原理&lt;/h2&gt;
+
+&lt;p&gt;要访问需要的数据，其实原理很简单：“长城”使用的是黑名单制。设想数据由 A 传到 B 被阻止，那是因为 A 和 B 之间有道墙，墙上挂着告示（名单），上说 A 被通缉，不得入内。可是，如果把 A 的数据传给 C，再由 C 传给 B 不就可以了吗？&lt;/p&gt;
+
+&lt;p&gt;这里有一点需要注意，那就是 C 和 A 之间不能再有“告示”，所以，C 的地理位置很重要，你懂的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-earth.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;楼长的做法是，首先在洛杉矶搭建一台服务机，然后在大洋两端分别完成 Shadowsocks client 和 Shadowsocks server。数据流将通过一台服务器的中转进来。一切完成之后，就可以继续追剧了。&lt;/p&gt;
+
+&lt;p&gt;除了《人民的名义》，我们也可以看到更多的新闻资料和技术材料，如 Google Scholar 等。&lt;/p&gt;
+
+&lt;p&gt;网上的所有言论都是由人发布的，而每个人的深层动机和政治考量各不相同，相信广大同胞凭借自己的智慧足以分辨，当然这一点和技术无关。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-cnn.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;shadowsocks-server&quot;&gt;Shadowsocks Server&lt;/h2&gt;
+
+&lt;p&gt;一. 获取硬件资源&lt;/p&gt;
+
+&lt;p&gt;首选当然是 Google cloud platform，谷歌为了广大老百姓也是操碎了心。遗憾的是，要访问 Google 服务器就要先 FQ，而如果能 FQ 还要 Google 干嘛？这是个悖论。&lt;/p&gt;
+
+&lt;p&gt;所以，这里我在其他榜上无名的服务商那里租来了一台小型服务器，用于满足个人需求（服务器的 CPU 和 Memory 均没有要求，但网络带宽要靠谱）。这里我选择使用的是 &lt;a href=&quot;https://my.rfchost.com/&quot;&gt;RFCHOST&lt;/a&gt;。本文并不是什么广告贴，大家用其他任何的服务商都是没有问题的。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-f.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;不过还是在啰嗦一句，租用服务器时建议将如下几点列入考虑范畴：&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;价格，当然要便宜些，服务器一般有年租和月租之分，不知水深的最好短期租用；&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;选择口碑好的服务商&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;另外（划重点），&lt;b&gt;服务器一定要在境外、香港或天朝的台湾省&lt;/b&gt;。&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;网上有很多为了新注册会员免费试用数月的优惠，所以即便是服务器也是可以淘到免费的。给大家个市场价，月租 5$ 左右，就足够拿到一台满足自己需求的服务器。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;以下开始技术部分！&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;二. 搭建服务器架构&lt;/p&gt;
+
+&lt;p&gt;这里默认大家已经有一台服务器了，那么怎样在上面搭建 Shadowsocks 服务呢？这里楼长以 Ubuntu 16.04 为例介绍。&lt;/p&gt;
+
+&lt;p&gt;首先当然是进入系统，更新一下 apt-get 软件包，这一步是所有系统安装成功后都要做的。&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$sudo&lt;/span&gt; apt-get update
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;随后，通过 apt-get 安装 python-pip&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$sudo&lt;/span&gt; apt-get install python-pip
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;完成之后使用 pip 安装 shadowsocks 服务&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$sudo&lt;/span&gt; pip install shadowsocks
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;成功安装后，我们需要创建一个shadowsocks server 的配置文件，可以直接建在当前用户目录下&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$sudo&lt;/span&gt; vim ss-conf.json
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;然后输入&lt;/p&gt;
+
+&lt;div class=&quot;language-c highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;p&quot;&gt;{&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//使用当前服务器，填0.0.0.0
+&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;&quot;server&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;0.0.0.0&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//对外的服务端口,随意
+&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;&quot;server_port&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;8888&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//本地IP和端口
+&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;&quot;local_address&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;127.0.0.1&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;s&quot;&gt;&quot;local_port&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;1080&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//shadowsocks密码，自己设置
+&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;&quot;password&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;youpassword&quot;&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;    
+    &lt;span class=&quot;s&quot;&gt;&quot;timeout&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;mi&quot;&gt;600&lt;/span&gt;&lt;span class=&quot;p&quot;&gt;,&lt;/span&gt;
+    &lt;span class=&quot;c1&quot;&gt;//加密方式
+&lt;/span&gt;    &lt;span class=&quot;s&quot;&gt;&quot;method&quot;&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;s&quot;&gt;&quot;aes-256-cfb&quot;&lt;/span&gt;
+&lt;span class=&quot;p&quot;&gt;}&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;保存。&lt;/p&gt;
+
+&lt;p&gt;最后，利用这个配置文件启动 shadowsocks 服务。&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$sudo&lt;/span&gt; ssserver -c ss-conf.json -d start
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;至此，服务器的配置也就完成了，简单吧！&lt;/p&gt;
+
+&lt;p&gt;当然，我使用的是裸服务器，对于使用 google cloud 服务器的童鞋请注意，由于 google cloud 自带防火墙，所以我们需要在防火墙规则里加入端口白名单，否则外部是无法访问这个端口的服务的。&lt;/p&gt;
+
+&lt;p&gt;修改防火墙设置的方法官方给出了详细说明，如下图，也可以请教&lt;a href=&quot;https://www.baidu.com/s?wd=google%20cloud%20platform%20%E9%98%B2%E7%81%AB%E5%A2%99%E4%BF%AE%E6%94%B9&amp;amp;rsv_spt=1&amp;amp;rsv_iqid=0xeb483baa0000adc7&amp;amp;issp=1&amp;amp;f=8&amp;amp;rsv_bp=0&amp;amp;rsv_idx=2&amp;amp;ie=utf-8&amp;amp;tn=baiduhome_pg&amp;amp;rsv_enter=1&amp;amp;rsv_sug3=46&amp;amp;rsv_sug1=3&amp;amp;rsv_sug7=100&amp;amp;rsv_t=3c7dR0oOboXLJECGPejbICEbc781wBiWLqGjKBK2v46p16cQs%2FFILl85DLcYUekuhTtj&amp;amp;rsv_sug2=0&amp;amp;inputT=9213&amp;amp;rsv_sug4=9214&quot;&gt;度娘&lt;/a&gt;，这里就不再赘述。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-google-platform.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;shadowsocks-client&quot;&gt;Shadowsocks client&lt;/h2&gt;
+
+&lt;p&gt;如此一来，大洋另一端的服务器也就完成了（Shadowsocks server），下面来看看本地的客户端（Shadowsocks client）。&lt;/p&gt;
+
+&lt;p&gt;由于客户端的多样性，这里分别介绍：&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;一. Windows&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;首先介绍 Windows，需要注意，在 Windows 除了安装客户端，还要对浏览器进行额外配置。这是 Windows 比其它操作系统要复杂的地方。&lt;/p&gt;
+
+&lt;p&gt;通常情况，我们希望浏览器在访问的国外网站的时候使用shadowsocks，而访问国内网站的时候使用本地网络，比如你在优酷看视频，并不需要走一圈代理，这样速度反而会更慢。那么安利一个 chrome 下 shadowsocks 的黄金搭档，SwitchyOmega。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-switchyomega.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这个可以在 chrome 应用商店里下载安装。（配置的复杂程度和当初配 goagent 相当，求阴影面积）&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;深吸一口气，下面开始介绍本文最晦涩的一部分：&lt;b&gt;Chrome&lt;/b&gt; + &lt;b&gt;SwitchyOmega&lt;/b&gt; + &lt;b&gt;Shadowsocks&lt;/b&gt; 的黄金组合！&lt;/p&gt;
+
+&lt;p&gt;1. 电脑端下载 shadowscoks(&lt;a href=&quot;https://github.com/shadowsocksr/shadowsocksr-csharp/releases&quot;&gt;最新版下载链接&lt;/a&gt;)，打开后开始配置，第一步选择 “编辑服务器”&lt;/p&gt;
+
+&lt;p&gt;2. 在这里配置上你获得的 shadowsocks 的IP 端口 和密码，代理端口可以只有选择的，不过一般都选择 1080。&lt;/p&gt;
+
+&lt;p&gt;具体配置的内容，和接下来介绍的 macbook 上的配置一样一样的，除了界面丑陋点。&lt;/p&gt;
+
+&lt;p&gt;3. 点击下 “&lt;b&gt;从GFWLIST更新本地PAC&lt;/b&gt;“ 更新完PAC后选择 &lt;b&gt;使用本地PAC&lt;/b&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-1.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;4. 系统代理模式 选择 &lt;b&gt;PAC模式&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-2.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;5. 正常来说运行了ShadowsocksR后就可以直接访问Chrome应用商店安装了（&lt;a href=&quot;https://github.com/FelisCatus/SwitchyOmega/releases&quot;&gt;在 Github 上下载最新版安装包&lt;/a&gt;）。&lt;/p&gt;
+
+&lt;p&gt;chrome 安装好 &lt;a href=&quot;https://chrome.google.com/webstore/detail/proxy-switchyomega/padekgcemlokbadohgkifijomclgjgif?utm_source=chrome-app-launcher-info-dialog&quot;&gt;switchyomega&lt;/a&gt; 后选择 &lt;b&gt;新建情景模式&lt;/b&gt;，&lt;b&gt;情景模式名称&lt;/b&gt; 可以随便选择 模式类型选择第一个 &lt;b&gt;代理服务器&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-new.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;6. 代理服务器按下表配置就okay了，到此也就可以正常使用了PAC模式了。但是为了更进一步更方便的使用我们还可以增加一步自动切换。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-3.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;7. 选择右边的 &lt;b&gt;自动切换/auto switch&lt;/b&gt; 最下面的 &lt;b&gt;规则列表设置&lt;/b&gt; 按下表设置就好了 规则网址也是我图上给出的这个。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-4.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这里，AutoProxy 规则列表地址有所变动，新的地址是:
+&lt;a href=&quot;https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt&quot;&gt;https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;8. 然后最关键的一步，在浏览器右上角点击插件按钮，然后选择自动切换规则模式，这样只要在规则列表里面的网站都会翻墻访问。&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;本部分参考：&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;&lt;a href=&quot;http://blog.sina.com.cn/s/blog_76ed34130102vl8r.html&quot;&gt;Chrome+SwitchyOmega+Shadowsocks 完整篇&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;em&gt;&lt;a href=&quot;https://github.com/FelisCatus/SwitchyOmega/wiki/GFWList&quot;&gt;GFWList · FelisCatus/SwitchyOmega Wiki · GitHub&lt;/a&gt;&lt;/em&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+&lt;p&gt;&lt;b&gt;二. Macbook&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;Mac 和 Windows 一样，都有 Shadowsocks 客户端，可以在这里&lt;a href=&quot;https://pan.baidu.com/s/1jIkeUPo&quot;&gt;下载&lt;/a&gt;。配置的话就像这样输入，然后启动&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-mac.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;虽然很多教程声明，安装完成后不需要重启计算机即可使用服务，但从楼长的实际操作来看，还是要重启电脑的。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;三. Android&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;Android 的安装是最简单的，IP 等配置和前面介绍的完全相同。&lt;/p&gt;
+
+&lt;p&gt;这里只给出下载地址：&lt;a href=&quot;https://github.com/shadowsocks/shadowsocks-android/releases&quot;&gt;［Download］&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;对了，Shadowsocks 还有个中文名字，叫“影梭”，换了马甲还是要认识的。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;四. Linux&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;由于撰写本文时楼长的 linux 电脑没开，也懒得开了，这里就不截图了。&lt;/p&gt;
+
+&lt;p&gt;安装命令如下：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$sudo&lt;/span&gt; add-apt-repository ppa:hzwhuang/ss-qt5
+&lt;span class=&quot;nv&quot;&gt;$sudo&lt;/span&gt; apt-get update
+&lt;span class=&quot;nv&quot;&gt;$sudo&lt;/span&gt; apt-get install shadowsocks-qt5
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;安装之后对于浏览器的配置与 Windows 类似。&lt;/p&gt;
+
+&lt;h2 id=&quot;关于本网站的评论&quot;&gt;关于本网站的评论&lt;/h2&gt;
+
+&lt;p&gt;在楼长的第一篇博客中介绍过本博客是如何搭建起来的，但当时对于博客重要的一环：&lt;b&gt;评论系统&lt;/b&gt; 按下不表。&lt;/p&gt;
+
+&lt;p&gt;这其实也是 FQ 的问题，其实楼长在搭建本系统时是嵌入了评论系统的，由于国内最大的评论系统 &lt;b&gt;多说&lt;/b&gt; 在即将到来的六月一号就要关闭，我选择使用了美帝的 DISQUS，有图有真相：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-disqus.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;所以，如果作为吃瓜群众没能看到评论，说明还没 FQ 成功，后续楼长会把评论系统部分重新设计…&lt;/p&gt;
+
+&lt;h2 id=&quot;背景&quot;&gt;背景&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.evernote.com/shard/s9/sh/4b3fda4c-866b-4025-987f-8328f28d6d1b/ad5beb3531adb7b7f33b30903fd6b0ff&quot;&gt;如何看待2015年8月20日 shadowsocks 作者停止维护的事件? - Shadowsocks - 知乎&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;以上。&lt;/p&gt;
+
+&lt;hr /&gt;
+
+</description>
+        <pubDate>Mon, 17 Apr 2017 05:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2017/04/17/shadowsocks/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/04/17/shadowsocks/</guid>
+        
+        <category>Google</category>
+        
+        <category>Shadowsocks</category>
+        
+        
+      </item>
     
       <item>
         <title>「51CTO」Hadoop平台与开发环境搭建</title>
@@ -40,12 +277,12 @@
     &lt;tr&gt;
       &lt;td&gt;Slave_one&lt;/td&gt;
       &lt;td&gt;hadoop&lt;/td&gt;
-      &lt;td&gt;10.0.1.27&lt;/td&gt;
+      &lt;td&gt;10.0.1.39&lt;/td&gt;
     &lt;/tr&gt;
     &lt;tr&gt;
       &lt;td&gt;Slave_two&lt;/td&gt;
       &lt;td&gt;hadoop&lt;/td&gt;
-      &lt;td&gt;10.0.1.27&lt;/td&gt;
+      &lt;td&gt;10.0.1.40&lt;/td&gt;
     &lt;/tr&gt;
   &lt;/tbody&gt;
 &lt;/table&gt;
@@ -486,7 +723,7 @@ There are 0 datanode(s) running and no node(s) are excluded in this operation.
 
 &lt;p&gt;1. 安装 JDK 环境&lt;/p&gt;
 
-&lt;p&gt;注意，这里安装的 JDK 要和集群上的版本保持一致。下载地址：&lt;a href=&quot;http://www.oracle.com/technetwork/java/javase/downloads/index.html&quot;&gt;http://www.oracle.com/technetwork/java/javase/downloads/index.html&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;注意，这里安装的 JDK 要和集群上的版本保持一致。&lt;/p&gt;
 
 &lt;p&gt;2. 安装 Eclipse&lt;/p&gt;
 

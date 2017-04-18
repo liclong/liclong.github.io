@@ -4,7 +4,7 @@ title:      "「51CTO」Hadoop平台与开发环境搭建"
 subtitle:   "An open source framework for distributed storage and parallel processing using MapReduce"
 date:       2017-04-16 12:00:00
 author:     "Chris"
-header-img: "img/post-bg-os-metro.jpg"
+header-img: "img/home-bg-art.jpg"
 header-mask: 0.3
 catalog:    true
 tags:
