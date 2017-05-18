@@ -4,7 +4,7 @@ title:      "绕过 Windows 7 登录密码的小技巧"
 subtitle:   "..."
 date:       2017-05-17 12:00:00
 author:     "Chris"
-header-img: "img/post-bg-os-metro.jpg"
+header-img: "img/post-bg-rwd.jpg"
 header-mask: 0.3
 catalog:    true
 tags:
