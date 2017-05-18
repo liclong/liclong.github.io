@@ -5,9 +5,81 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Tue, 18 Apr 2017 07:05:00 -0700</pubDate>
-    <lastBuildDate>Tue, 18 Apr 2017 07:05:00 -0700</lastBuildDate>
+    <pubDate>Thu, 18 May 2017 02:42:23 -0700</pubDate>
+    <lastBuildDate>Thu, 18 May 2017 02:42:23 -0700</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>绕过 Windows 7 登录密码的小技巧</title>
+        <description>&lt;p&gt;一、Windows的登录界面&lt;/p&gt;
+
+&lt;p&gt;如下图所示，利用终端可以绕过登录界面，直接进入这堵墙背后的C盘，D盘，E盘，et al.&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG1.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;before that, 两个问题需要回答：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;
+    &lt;p&gt;怎样在登录界面上使用终端？&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;终端出现了，然后呢？&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;二、Q1: 怎样在登录界面上使用终端&lt;/p&gt;
+
+&lt;p&gt;细心的童鞋会留意到，登录界面左下方有个“快速访问”的按钮，点开之后会出现各种小工具方便使用，比如“放大器”、“屏幕键盘”。&lt;/p&gt;
+
+&lt;p&gt;只要能将终端程序替代掉“放大器”，就能直接在这里调出cmd。&lt;/p&gt;
+
+&lt;p&gt;放大器对应的程序位于 C:\Windows\System32\Magnify.exe，所以，只要用 cmd.exe 替换掉 Magnify.exe 即可。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG4.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG5.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;问题来了，桌面登不进去，怎么进行替换？&lt;/p&gt;
+
+&lt;p&gt;可以利用 U 盘做一个启动项，利用启动盘的系统使用功能管理整个磁盘，找到文件并替换。&lt;/p&gt;
+
+&lt;p&gt;过程中会遇到文件修改权限问题（sudo，你懂的）和 C 盘找不到的问题（利用 fdisk -l 查看挂在点，或直接 mount 挂在），总之最终结果就是：Magnify.exe 文件被 cmd.exe 文件成功替换。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG2.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;三、Q2: 终端出现了，然后呢？&lt;/p&gt;
+
+&lt;p&gt;Windows 终端命令：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;nv&quot;&gt;$net&lt;/span&gt; user USERNAME NEW_PASSSWORD
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这是一个逻辑上异常神奇的存在，因为用这一命令可以修改密码，而且而且，修改密码时不需要输入原密码。。。&lt;/p&gt;
+
+&lt;p&gt;举个例子，这里楼长终端输入: net user USTCLI 123456&lt;/p&gt;
+
+&lt;p&gt;随后关闭终端，在登录界面密码栏输入：123456，密码认证通过，顺利进入。&lt;/p&gt;
+
+&lt;p&gt;以后再用电脑，直接上 123456 就可以了。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;注：网络安全领域最困难的不是如何破门而入，而是破门而入后如何不被发现。本技巧是做不到这些的。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;hr /&gt;
+
+</description>
+        <pubDate>Wed, 17 May 2017 05:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2017/05/17/login-windowsOS-without-passwd/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/05/17/login-windowsOS-without-passwd/</guid>
+        
+        <category>Windows</category>
+        
+        <category>Security</category>
+        
+        
+      </item>
     
       <item>
         <title>利用 Shadowsocks 观看完整版「人民的名义」</title>
@@ -173,8 +245,7 @@
 
 &lt;p&gt;&lt;img src=&quot;/img/2017-04-17-shadowsocks/shadowsocks-4.jpeg&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
-&lt;p&gt;这里，AutoProxy 规则列表地址有所变动，新的地址是:
-&lt;a href=&quot;https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt&quot;&gt;https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;这里，AutoProxy 规则列表地址有所变动，新的地址是: &lt;a href=&quot;https://raw.githubusercontent.com/gfwlist/gfwlist/master/gfwlist.txt&quot;&gt;download&lt;/a&gt;&lt;/p&gt;
 
 &lt;p&gt;8. 然后最关键的一步，在浏览器右上角点击插件按钮，然后选择自动切换规则模式，这样只要在规则列表里面的网站都会翻墻访问。&lt;/p&gt;
 
