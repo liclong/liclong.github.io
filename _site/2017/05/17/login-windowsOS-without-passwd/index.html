@@ -151,13 +151,13 @@
 
     <!-- Image to hack wechat -->
 <!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
-<!-- <img src="/img/post-bg-os-metro.jpg" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-rwd.jpg" width="0" height="0"> -->
 
 <!-- Post Header -->
 <style type="text/css">
     header.intro-header{
         position: relative;
-        background-image: url('/img/post-bg-os-metro.jpg')
+        background-image: url('/img/post-bg-rwd.jpg')
     }
 
     
@@ -185,7 +185,7 @@
                     <h1>绕过 Windows 7 登录密码的小技巧</h1>
                     
                     
-                    <h2 class="subheading">...</h2>
+                    <h2 class="subheading"></h2>
                     
                     <span class="meta">Posted by Chris on May 17, 2017</span>
                 </div>
@@ -209,9 +209,9 @@
 
 <p>如下图所示，利用终端可以绕过登录界面，直接进入这堵墙背后的C盘，D盘，E盘，et al.</p>
 
-<p><img src="/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG1.jpeg" alt="" /></p>
+<p><img src="/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG1.jpeg" alt="img-w150" /></p>
 
-<p>before that, 两个问题需要回答：</p>
+<p>Before that, 两个问题需要回答：</p>
 
 <ol>
   <li>
@@ -228,19 +228,17 @@
 
 <p>只要能将终端程序替代掉“放大器”，就能直接在这里调出cmd。</p>
 
+<p><img src="/img/2017-05-17-login-windowsOS-without-passwd/cmd.png" alt="img" /></p>
+
 <p>放大器对应的程序位于 C:\Windows\System32\Magnify.exe，所以，只要用 cmd.exe 替换掉 Magnify.exe 即可。</p>
-
-<p><img src="/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG4.jpeg" alt="" /></p>
-
-<p><img src="/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG5.jpeg" alt="" /></p>
 
 <p>问题来了，桌面登不进去，怎么进行替换？</p>
 
 <p>可以利用 U 盘做一个启动项，利用启动盘的系统使用功能管理整个磁盘，找到文件并替换。</p>
 
-<p>过程中会遇到文件修改权限问题（sudo，你懂的）和 C 盘找不到的问题（利用 fdisk -l 查看挂在点，或直接 mount 挂在），总之最终结果就是：Magnify.exe 文件被 cmd.exe 文件成功替换。</p>
+<p><img src="/img/2017-05-17-login-windowsOS-without-passwd/boot.png" alt="img" /></p>
 
-<p><img src="/img/2017-05-17-login-windowsOS-without-passwd/WechatIMG2.jpeg" alt="" /></p>
+<p>过程中会遇到文件修改权限问题（sudo，你懂的）和 C 盘找不到的问题（利用 fdisk -l 查看挂载点，或直接 mount 挂载），总之最终结果就是：Magnify.exe 文件被 cmd.exe 文件成功替换。</p>
 
 <p>三、Q2: 终端出现了，然后呢？</p>
 
@@ -256,10 +254,6 @@
 <p>随后关闭终端，在登录界面密码栏输入：123456，密码认证通过，顺利进入。</p>
 
 <p>以后再用电脑，直接上 123456 就可以了。</p>
-
-<blockquote>
-  <p>注：网络安全领域最困难的不是如何破门而入，而是破门而入后如何不被发现。本技巧是做不到这些的。</p>
-</blockquote>
 
 <hr />
 
