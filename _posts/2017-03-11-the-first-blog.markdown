@@ -210,7 +210,7 @@ $ git commit -m "this is an update"
 $ git push          //推送到 GitHub
 ```
 
-打开浏览器，登录 http://liclong.github.io，你会看到 slate 主题的网页里。修改 index.html 文件即可进行修改。具体细节可实际摸索。
+打开浏览器，登录 [http://liclong.github.io][9]，你会看到 slate 主题的网页里。修改 index.html 文件即可进行修改。具体细节可实际摸索。
 
 注意，目前的 GitHub 进行了改版，以前各教程中提到的 theme 中的 "automatic page generator" 已经不在，大家不必纠结。
 
@@ -231,3 +231,4 @@ $ git push          //推送到 GitHub
 [6]: http://garrolan.blogspot.com/2017/03/app33.html
 [7]: http://www.becomingminimalist.com/15-reasons-i-think-you-should-blog/
 [8]: https://en.wikipedia.org/wiki/Mihaly_Csikszentmihalyi
+[9]: http://liclong.github.io

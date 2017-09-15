@@ -5,9 +5,468 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Thu, 18 May 2017 18:40:09 -0700</pubDate>
-    <lastBuildDate>Thu, 18 May 2017 18:40:09 -0700</lastBuildDate>
+    <pubDate>Fri, 15 Sep 2017 01:57:49 -0700</pubDate>
+    <lastBuildDate>Fri, 15 Sep 2017 01:57:49 -0700</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>Tensorflow学习笔记一 —— 从源码编译到部署安装</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;Key Words: Tensorflow, Bazel, CC&amp;amp;Python, Cuda&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;主流深度学习框架对比&quot;&gt;主流深度学习框架对比&lt;/h2&gt;
+
+&lt;p&gt;在进入一个领域之前，第一件紧要事就是寻找领域的“巨头”，也即代表性产品，以作为进入的敲门砖。深度学习领域近几年迅速发展，已经有多个成熟的开源框架可供选择，俨然成为了Big Data领域继Hadoop、Spark、图计算、流计算之后的又一战略高地。&lt;/p&gt;
+
+&lt;p&gt;2016年发表于KDD的论文《&lt;a href=&quot;https://arxiv.org/pdf/1511.06435.pdf&quot;&gt;Comparative Study of Deep Learning Software Frameworks&lt;/a&gt;》对已有框架进行了详细论述，目前主流的开源框架包括：Caffe2，Torch，MXNet，Tensorflow等。&lt;/p&gt;
+
+&lt;p&gt;笔者计划在后续工作中对框架源码进行修改并移植至手机端，因此在进行技术选型时从以下几个方面进行了考量：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;设计语言&lt;/li&gt;
+  &lt;li&gt;目前在工业界和学术界的接受度&lt;/li&gt;
+  &lt;li&gt;源码的可读性&lt;/li&gt;
+  &lt;li&gt;相关技术文档的完善度&lt;/li&gt;
+  &lt;li&gt;目前对于手机端的支持情况&lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;p&gt;通过以上五方面的对比，笔者最终选择了&lt;a href=&quot;https://arxiv.org/pdf/1603.04467.pdf&quot;&gt;Tensorflow&lt;/a&gt;框架。&lt;/p&gt;
+
+&lt;p&gt;这一框架主体由C++语言编写，C家族是学习系统层或以下所必备的语言，底层的资源管理完全要依托于C／汇编层级，相比之下，Java实在过于上层，不利于对整个系统的深入理解。&lt;/p&gt;
+
+&lt;p&gt;Tensorflow由Google设计并开源，G的技术水平和推广能力毋庸置疑，它在学术界和工业界的号召力保证了TF在未来一段时间的生命力，这一点从GitHub上被Star和Fork的数量可以判断。&lt;/p&gt;
+
+&lt;p&gt;TF是谷歌集中很多领域专家搞起来的，里面优秀的设计思想和实现非常值得学习，大名鼎鼎的Jeffrey Dean正是TF的重要设计者之一，很多独当一面的大牛在这里都干起了调bug的本行…&lt;/p&gt;
+
+&lt;p&gt;Google对TF进行了大量人力和财力的投入，这些正规军保证了TF的文档资料不会像一些开源社区那样半途而废或者杂乱无章。&lt;/p&gt;
+
+&lt;p&gt;目前TF的某些功能已可以支持Android系统，截止撰文时笔者还没有在移动端进行尝试，但估计做的还很简陋。&lt;/p&gt;
+
+&lt;h2 id=&quot;tensorflow安装&quot;&gt;Tensorflow安装&lt;/h2&gt;
+
+&lt;p&gt;我们首先来看一下怎样对TF直接安装，这里笔者的操作系统是Ubuntu-14.04。&lt;/p&gt;
+
+&lt;p&gt;对于TF的安装，以及相关编译链的构建，注意：&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;版本很重要，版本很重要，版本很重要！&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这里我们选择Tensorflow-1.3进行安装，截至撰文，r1.3是仅次于master的branch，属于次新的版本。（master版本太新，介绍文档以及与其它软件的兼容匹配度还不成熟）。&lt;/p&gt;
+
+&lt;p&gt;确定TF版本之后开始准备搭建环境。&lt;/p&gt;
+
+&lt;p&gt;一、Cuda安装&lt;/p&gt;
+
+&lt;p&gt;Cuda(Compute Unified Device Architecture)，是英伟达公司推出的一种基于新的并行编程模型和指令集架构的通用计算架构，它能利用英伟达GPU的并行计算引擎，比CPU更高效的解决许多复杂计算任务。&lt;/p&gt;
+
+&lt;p&gt;Cuda的官方下载地址为：&lt;/p&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://developer.nvidia.com/cuda-downloads&quot;&gt;https://developer.nvidia.com/cuda-downloads&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;这里需要在NVIDA官网注册一个免费用户才能下载，注册账号：l###@163.com，密码：Us123456。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/Cuda.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;这里安装类型选择 deb(local)。&lt;/p&gt;
+
+&lt;p&gt;下载文件cuda-repo-ubuntu1404-8-0-local-ga2_8.0.61-1_amd64.deb（1.9GB），版本为8.0。&lt;/p&gt;
+
+&lt;p&gt;将文件下载至“／home/chrisli/Cloud/Tensorflow/”目录：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/ls.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;执行命令：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo dpkg -i cuda-repo-ubuntu1404-8-0-local-ga2_8.0.61-1_amd64.deb
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get update
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install cuda
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;默认安装在：/usr/local/cuda&lt;/p&gt;
+
+&lt;p&gt;二、cuDNN安装&lt;/p&gt;
+
+&lt;p&gt;NVIDIA cuDNN是用于深度神经网络的GPU加速库。它强调性能、易用性和低内存开销。&lt;/p&gt;
+
+&lt;p&gt;cuDNN下载地址：&lt;a href=&quot;https://developer.nvidia.com/cudnn&quot;&gt;https://developer.nvidia.com/cudnn&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;这里注意，选择的cuDNN版本既要和Cuda兼容，又要支持1.3版本的Tensorflow。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/CuDNN.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;我们选择了“cuDNN v6.0 for CUDA 8.0”，上图中需要下载的是 “cuDNN v6.0 Library for Linux”而不是deb文件，在初期笔者曾犯过这个错误。&lt;/p&gt;
+
+&lt;p&gt;同上，输入以下命令：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;tar xvzf cudnn-7.0-linux-x64-v4.0-prod.tgz
+
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo cp cuda/include/cudnn.h /usr/local/cuda/include
+
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo cp cuda/lib64/libcudnn&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt; /usr/local/cuda/lib64
+
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo chmod a+r /usr/local/cuda/lib64/libcudnn&lt;span class=&quot;k&quot;&gt;*&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;安装完成之后，可以通过如下命令分别查看Cuda和cuDNN的版本信息：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;cat /usr/local/cuda/version.txt
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;cat /usr/local/cuda/include/cudnn.h | grep CUDNN_MAJOR -A 2
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;三、Python开发环境&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install python-numpy python-pip swig python-dev python-wheel
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo pip install six numpy wheel
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;根据官网描述，需要安装python3.x版本的，可以执行如下操作：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install python3-numpy python3-dev python3-pip python3-wheel
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这里笔者使用的2.7版本，并未对3.x版进行尝试。&lt;/p&gt;
+
+&lt;p&gt;四、Tensorflow下载安装&lt;/p&gt;
+
+&lt;p&gt;在终端利用pip直接安装&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo pip install --upgrade https://storage.googleapis.com/tensorflow/linux/cpu/tensorflow-1.3.0-cp27-none-linux_x86_64.whl
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;注意，这里的“tensorflow-1.3.0-cp27-none-linux_x86_64.whl”安装包，也就是我们后面编译源码的目标，对TF源码编译的最终结果就是生成这样一个安装包，然后本地进行安装。&lt;/p&gt;
+
+&lt;p&gt;五、检验是否安装成功&lt;/p&gt;
+
+&lt;p&gt;通过如下一段代码检验是否安装成功：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;python
+...
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;import tensorflow as tf
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;hello &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; tf.constant&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;&lt;span class=&quot;s1&quot;&gt;'Hello, TensorFlow!'&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;sess &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; tf.Session&lt;span class=&quot;o&quot;&gt;()&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;print&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;sess.run&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;hello&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+Hello, TensorFlow!
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;a &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; tf.constant&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;10&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;b &lt;span class=&quot;o&quot;&gt;=&lt;/span&gt; tf.constant&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;32&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;print&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;sess.run&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;a + b&lt;span class=&quot;o&quot;&gt;))&lt;/span&gt;
+42
+&amp;gt;&amp;gt;&amp;gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;从安装进度来看，输入“import tensorflow as tf”语句仅仅算是完成了一半，因为各式各样的ERROR在敲下回车键后出现，详情会在［疑难问题］一章总结。&lt;/p&gt;
+
+&lt;h2 id=&quot;编译环境搭建&quot;&gt;编译环境搭建&lt;/h2&gt;
+
+&lt;p&gt;一、Bazel安装&lt;/p&gt;
+
+&lt;p&gt;Bazel是Google开源构建工具，类似于Make的工具，用来编译Tensorflow。&lt;/p&gt;
+
+&lt;p&gt;Bazel目前已被Google开源并托管在GitHub，地址：&lt;a href=&quot;https://github.com/bazelbuild/bazel/releases&quot;&gt;https://github.com/bazelbuild/bazel/releases&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;这里下载的是.sh的脚本文件，我们选择版本bazel-0.5.4。&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;sudo apt-get install pkg-config zip g++zlib1g-dev unzip
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;chmod +x bazel-0.5.4-installer-linux-x86_64.sh
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;./bazel-0.5.4-installer-linux-x86_64.sh --user
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;&lt;span class=&quot;nb&quot;&gt;export &lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;PATH&lt;/span&gt;&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;&quot;&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$PATH&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;:&lt;/span&gt;&lt;span class=&quot;nv&quot;&gt;$HOME&lt;/span&gt;&lt;span class=&quot;s2&quot;&gt;/bin&quot;&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;除了手动安装，bazel也支持通过apt-get直接安装，这种方式更为简便，当然对版本选择的控制力会被削弱。&lt;/p&gt;
+
+&lt;p&gt;详细步骤可参考：&lt;a href=&quot;https://docs.bazel.build/versions/master/install-ubuntu.html&quot;&gt;https://docs.bazel.build/versions/master/install-ubuntu.html&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;二、TensorFlow源码下载&lt;/p&gt;
+
+&lt;p&gt;TF源码同样托管于GitHub：&lt;a href=&quot;https://github.com/tensorflow/tensorflow&quot;&gt;https://github.com/tensorflow/tensorflow&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;注意默认Branch是master，但master在编译时仍有问题（版本兼容性问题），所以这里选择克隆r1.3版。&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;git clone -b r1.3 https://github.com/tensorflow/tensorflow.git
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;可以通过 git branch 确认分支。&lt;/p&gt;
+
+&lt;p&gt;三、配置文件&lt;/p&gt;
+
+&lt;p&gt;编译前通过Configure文件进行配置。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cd tensorflow  # cd to the top-level directory created
+$ ./configure
+Please specify the location of python. [Default is /usr/bin/python]: /usr/bin/python2.7
+Found possible Python library paths:
+/usr/local/lib/python2.7/dist-packages
+/usr/lib/python2.7/dist-packages
+Please input the desired Python library path to use.  Default is [/usr/lib/python2.7/dist-packages]
+
+Using python library path: /usr/local/lib/python2.7/dist-packages
+Do you wish to build TensorFlow with MKL support? [y/N]
+No MKL support will be enabled for TensorFlow
+Please specify optimization flags to use during compilation when bazel option &quot;--config=opt&quot; is specified [Default is -march=native]:
+Do you wish to use jemalloc as the malloc implementation? [Y/n]
+jemalloc enabled
+Do you wish to build TensorFlow with Google Cloud Platform support? [y/N]
+No Google Cloud Platform support will be enabled for TensorFlow
+Do you wish to build TensorFlow with Hadoop File System support? [y/N]
+No Hadoop File System support will be enabled for TensorFlow
+Do you wish to build TensorFlow with the XLA just-in-time compiler (experimental)? [y/N]
+No XLA support will be enabled for TensorFlow
+Do you wish to build TensorFlow with VERBS support? [y/N]
+No VERBS support will be enabled for TensorFlow
+Do you wish to build TensorFlow with OpenCL support? [y/N]
+No OpenCL support will be enabled for TensorFlow
+Do you wish to build TensorFlow with CUDA support? [y/N] Y
+CUDA support will be enabled for TensorFlow
+Do you want to use clang as CUDA compiler? [y/N]
+nvcc will be used as CUDA compiler
+Please specify the Cuda SDK version you want to use, e.g. 7.0. [Leave empty to default to CUDA 8.0]: 8.0
+Please specify the location where CUDA 8.0 toolkit is installed. Refer to README.md for more details. [Default is /usr/local/cuda]:
+Please specify which gcc should be used by nvcc as the host compiler. [Default is /usr/bin/gcc]:
+Please specify the cuDNN version you want to use. [Leave empty to default to cuDNN 6.0]: 6
+Please specify the location where cuDNN 6 library is installed. Refer to README.md for more details. [Default is /usr/local/cuda]:
+Please specify a list of comma-separated Cuda compute capabilities you want to build with.
+You can find the compute capability of your device at: https://developer.nvidia.com/cuda-gpus.
+Please note that each additional compute capability significantly increases your build time and binary size.
+[Default is: &quot;3.5,5.2&quot;]: 3.0
+Do you wish to build TensorFlow with MPI support? [y/N] 
+MPI support will not be enabled for TensorFlow
+Configuration finished
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;四、编译&lt;/p&gt;
+
+&lt;p&gt;随后，执行如下命令进行编译：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;bazel build --config&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;opt //tensorflow/tools/pip_package:build_pip_package
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;如果支持Cuda，可以：&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;bazel build --config&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;opt --config&lt;span class=&quot;o&quot;&gt;=&lt;/span&gt;cuda //tensorflow/tools/pip_package:build_pip_package
+&lt;span class=&quot;gp&quot;&gt;$ &lt;/span&gt;bazel-bin/tensorflow/tools/pip_package/build_pip_package /tmp/tensorflow_pkg
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;执行成功后，会生成安装包，直接本地安装即可：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ sudo pip install /tmp/tensorflow_pkg/tensorflow-1.3.0-cp27-none-linux_x86_64.whl
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;当然，各种奇葩问题会出现在编译阶段。&lt;/p&gt;
+
+&lt;h2 id=&quot;疑难问题&quot;&gt;疑难问题&lt;/h2&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;以下问题均在笔者动手部署时出现过，其中部分源码引自网络。&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;&lt;strong&gt;一、ImportError: No module named ‘_pywrap_tensorflow_internal’ 解决方法&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt;import tensorflow
+Traceback (most recent call last):
+File &quot;C:\Program Files\Anaconda3\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py&quot;, line 18, in swig_import_helper
+return importlib.import_module(mname)
+File &quot;C:\Program Files\Anaconda3\lib\importlib\__init__.py&quot;, line 126, in import_module
+return _bootstrap._gcd_import(name[level:], package, level)
+File &quot;&amp;lt;frozen importlib._bootstrap&amp;gt;&quot;, line 986, in _gcd_import
+File &quot;&amp;lt;frozen importlib._bootstrap&amp;gt;&quot;, line 969, in _find_and_load
+File &quot;&amp;lt;frozen importlib._bootstrap&amp;gt;&quot;, line 958, in _find_and_load_unlocked
+File &quot;&amp;lt;frozen importlib._bootstrap&amp;gt;&quot;, line 666, in _load_unlocked
+File &quot;&amp;lt;frozen importlib._bootstrap&amp;gt;&quot;, line 577, in module_from_spec
+File &quot;&amp;lt;frozen importlib._bootstrap_external&amp;gt;&quot;, line 906, in create_module
+File &quot;&amp;lt;frozen importlib._bootstrap&amp;gt;&quot;, line 222, in _call_with_frames_removed
+ImportError: DLL load failed: 找不到指定的模块。
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+File &quot;C:\Program Files\Anaconda3\lib\site-packages\tensorflow\python\pywrap_tensorflow.py&quot;, line 41, in &amp;lt;module&amp;gt;
+from tensorflow.python.pywrap_tensorflow_internal import *
+File &quot;C:\Program Files\Anaconda3\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py&quot;, line 21, in &amp;lt;module&amp;gt;
+_pywrap_tensorflow_internal = swig_import_helper()
+File &quot;C:\Program Files\Anaconda3\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py&quot;, line 20, in swig_import_helper
+return importlib.import_module('_pywrap_tensorflow_internal')
+File &quot;C:\Program Files\Anaconda3\lib\importlib\__init__.py&quot;, line 126, in import_module
+return _bootstrap._gcd_import(name[level:], package, level)
+ImportError: No module named '_pywrap_tensorflow_internal'
+
+During handling of the above exception, another exception occurred:
+
+Traceback (most recent call last):
+File &quot;C:\Program Files\Anaconda3\lib\site-packages\tensorflow\python\pywrap_tensorflow.py&quot;, line 41, in &amp;lt;module&amp;gt;
+from tensorflow.python.pywrap_tensorflow_internal import *
+File &quot;C:\Program Files\Anaconda3\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py&quot;, line 21, in &amp;lt;module&amp;gt;
+_pywrap_tensorflow_internal = swig_import_helper()
+File &quot;C:\Program Files\Anaconda3\lib\site-packages\tensorflow\python\pywrap_tensorflow_internal.py&quot;, line 20, in swig_import_helper
+return importlib.import_module('_pywrap_tensorflow_internal')
+File &quot;C:\Program Files\Anaconda3\lib\importlib\__init__.py&quot;, line 126, in import_module
+return _bootstrap._gcd_import(name[level:], package, level)
+ImportError: No module named '_pywrap_tensorflow_internal'
+
+
+Failed to load the native TensorFlow runtime.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这个是由于我之前一个没注意装了cudnn3.0，而r1.3版的tensorflow，需要cudnn6.0&lt;/p&gt;
+
+&lt;p&gt;所以把cudnn3.0换成cudnn6.0就好了&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;二、error in Building tensor flow. [sun.security.validator.ValidatorException:] #12874&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;解决方案： &lt;br /&gt;
+i solved it by changing branch r1.3 -&amp;gt;./configure -&amp;gt; build.&lt;br /&gt;
+May be issue with latest master code.&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;三、tensorflow build error with bazel (-c to -s)&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;笔者最初编译时总是出错，直到把参数-c改为-s，第一次编译通过&lt;br /&gt;
+bazel build -s //tensorflow/tools/pip_package:build_pip_package&lt;br /&gt;
+奇怪的是，将参数变回来也通过了，任性。。。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;四、Cannot import tensorflow in python #1013&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; import tensorflow as tf
+Traceback (most recent call last):
+File &quot;&amp;lt;stdin&amp;gt;&quot;, line 1, in &amp;lt;module&amp;gt;
+File &quot;C:\Users\Or\AppData\Local\Enthought\Canopy\User\lib\site-packages\tensorflow\__init__.py&quot;, line 4, in &amp;lt;module&amp;gt;
+from tensorflow.python import *
+File &quot;C:\Users\Or\AppData\Local\Enthought\Canopy\User\lib\site-packages\tensorflow\python\__init__.py&quot;, line 22, in &amp;lt;module&amp;gt;
+from tensorflow.python.client.client_lib import *
+File &quot;C:\Users\Or\AppData\Local\Enthought\Canopy\User\lib\site-packages\tensorflow\python\client\client_lib.py&quot;, line 35, in &amp;lt;module&amp;gt;
+from tensorflow.python.client.session import InteractiveSession
+File &quot;C:\Users\Or\AppData\Local\Enthought\Canopy\User\lib\site-packages\tensorflow\python\client\session.py&quot;, line 11, in &amp;lt;module&amp;gt;
+from tensorflow.python import pywrap_tensorflow as tf_session
+File &quot;C:\Users\Or\AppData\Local\Enthought\Canopy\User\lib\site-packages\tensorflow\python\pywrap_tensorflow.py&quot;, line 28, in &amp;lt;module&amp;gt;
+_pywrap_tensorflow = swig_import_helper()
+File &quot;C:\Users\Or\AppData\Local\Enthought\Canopy\User\lib\site-packages\tensorflow\python\pywrap_tensorflow.py&quot;, line 20, in swig_import_helper
+import _pywrap_tensorflow
+ImportError: No module named _pywrap_tensorflow
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;对这一问题的描述主要是版本问题，牵扯到numpy、cuda、cudnn等多个方面，具体可见&lt;a href=&quot;https://github.com/tensorflow/tensorflow/issues/1013&quot;&gt;https://github.com/tensorflow/tensorflow/issues/1013&lt;/a&gt;的讨论。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;五、AttributeError: type object ‘NewBase’ has no attribute ‘is_abstract’ #2016&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; import tensorflow as tf I tensorflow/stream_executor/dso_loader.cc:105] successfully opened CUDA library libcublas.so locally I tensorflow/stream_executor/dso_loader.cc:105] successfully opened CUDA library libcudnn.so locally I tensorflow/stream_executor/dso_loader.cc:105] successfully opened CUDA library libcufft.so locally I tensorflow/stream_executor/dso_loader.cc:105] successfully opened CUDA library libcuda.so.1 locally I tensorflow/stream_executor/dso_loader.cc:105] successfully opened CUDA library libcurand.so locally Traceback (most recent call last): File &quot;&amp;lt;stdin&amp;gt;&quot;, line 1, in &amp;lt;module&amp;gt; File &quot;/usr/local/lib/python2.7/dist-packages/tensorflow/__init__.py&quot;, line 23, in &amp;lt;module&amp;gt; from tensorflow.python import * File &quot;/usr/local/lib/python2.7/dist-packages/tensorflow/python/__init__.py&quot;, line 94, in &amp;lt;module&amp;gt; from tensorflow.python.platform import test File &quot;/usr/local/lib/python2.7/dist-packages/tensorflow/python/platform/test.py&quot;, line 62, in &amp;lt;module&amp;gt; from tensorflow.python.framework import test_util File &quot;/usr/local/lib/python2.7/dist-packages/tensorflow/python/framework/test_util.py&quot;, line 41, in &amp;lt;module&amp;gt; from tensorflow.python.platform import googletest File &quot;/usr/local/lib/python2.7/dist-packages/tensorflow/python/platform/googletest.py&quot;, line 32, in &amp;lt;module&amp;gt; from tensorflow.python.platform import benchmark # pylint: disable=unused-import File &quot;/usr/local/lib/python2.7/dist-packages/tensorflow/python/platform/benchmark.py&quot;, line 112, in &amp;lt;module&amp;gt; class Benchmark(six.with_metaclass(_BenchmarkRegistrar, object)): File &quot;/usr/lib/python2.7/dist-packages/six.py&quot;, line 617, in with_metaclass return meta(&quot;NewBase&quot;, bases, {}) File &quot;/usr/local/lib/python2.7/dist-packages/tensorflow/python/platform/benchmark.py&quot;, line 107, in __new__ if not newclass.is_abstract(): AttributeError: type object 'NewBase' has no attribute 'is_abstract'
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;I solved this problem by reinstall the package six:&lt;br /&gt;
+sudo pip uninstall six&lt;br /&gt;
+sudo pip install six –upgrade –target=”/usr/lib/python2.7/dist-packages”\&lt;/p&gt;
+
+&lt;p&gt;以上是查到的解决方案，但在卸载six时出现own by os的提示，无法卸载。&lt;/p&gt;
+
+&lt;p&gt;通过&lt;/p&gt;
+
+&lt;div class=&quot;language-sh highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;import six
+&lt;span class=&quot;gp&quot;&gt;&amp;gt;&amp;gt;&amp;gt; &lt;/span&gt;print&lt;span class=&quot;o&quot;&gt;(&lt;/span&gt;six.__version__&lt;span class=&quot;o&quot;&gt;)&lt;/span&gt;
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;我们发现six的版本并未发生变化，这是因为six实际在本机共存了版本，但默认的那个版本没有改变，因此我们直接rm删除掉了/usr/lib/python2.7/dist-packages目录，奇迹出现了。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/q5.png&quot; alt=&quot;&quot; /&gt;
+&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/q6.png&quot; alt=&quot;&quot; /&gt;
+&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/q7.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;同样的问题出现在protobuf：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; import protobuf
+&amp;gt;&amp;gt;&amp;gt; print protobuf.__version__
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;Recently, I have learnt a simple method to get the version of the packages, such as numpy, six and protobuf, like this:&lt;br /&gt;
+pip show numpy six protobuf&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;六、编译时用户所在路径问题&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;网上讨论中多次提到，在import tensorflow时要离开其所在目录。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/q8.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;七、RuntimeError: module compiled against API version a but this version of numpy is 9&lt;/strong&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt;&amp;gt;&amp;gt; runfile('/Users/isaiahnields/.spyder2/temp.py', wdir='/Users/isaiahnields/.spyder2')
+RuntimeError: module compiled against API version a but this version of numpy is 9
+Traceback (most recent call last):
+File &quot;&amp;lt;stdin&amp;gt;&quot;, line 1, in &amp;lt;module&amp;gt;
+File &quot;/Applications/Spyder-Py2.app/Contents/Resources/lib/python2.7/spyderlib/widgets/externalshell/sitecustomize.py&quot;, line 685, in runfile
+execfile(filename, namespace)
+File &quot;/Applications/Spyder-Py2.app/Contents/Resources/lib/python2.7/spyderlib/widgets/externalshell/sitecustomize.py&quot;, line 78, in execfile
+builtins.execfile(filename, *where)
+File &quot;/Users/isaiahnields/.spyder2/temp.py&quot;, line 9, in &amp;lt;module&amp;gt;
+import cv
+File &quot;/Applications/Spyder-Py2.app/Contents/Resources/lib/python2.7/cv.py&quot;, line 1, in &amp;lt;module&amp;gt;
+from cv2.cv import *
+ImportError: numpy.core.multiarray failed to import
+&amp;gt;&amp;gt;&amp;gt; 
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;显然，这同样是一个版本不兼容的问题。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;import numpy as np 
+print np.__version__ 
+print np.__path__
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;解决方案详见：&lt;br /&gt;
+&lt;a href=&quot;https://stackoverflow.com/questions/33859531/runtimeerror-module-compiled-against-api-version-a-but-this-version-of-numpy-is&quot;&gt;https://stackoverflow.com/questions/33859531/runtimeerror-module-compiled-against-api-version-a-but-this-version-of-numpy-is&lt;/a&gt; &amp;amp; &lt;a href=&quot;https://stackoverflow.com/questions/28517937/how-can-i-upgrade-numpy&quot;&gt;https://stackoverflow.com/questions/28517937/how-can-i-upgrade-numpy&lt;/a&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/q9.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;八、Unable to Uninstall Program : Own by OS&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这一问题的解决方案有：&lt;a href=&quot;https://askubuntu.com/questions/647919/unable-to-uninstall-program-own-by-os&quot;&gt;https://askubuntu.com/questions/647919/unable-to-uninstall-program-own-by-os&lt;/a&gt;。&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;九、ImportError: Need nose &amp;gt;=0.10.0 for tests #4074 Closed&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;这是一个较明显的问题，也容易解决。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/q10.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;strong&gt;十、protobuf的安装&lt;/strong&gt;&lt;/p&gt;
+
+&lt;p&gt;TF官方教程中并未要求必须安装protobuf，但视情况而定。如果编译或执行时有这一关键字的ERROR，需要对它进行安装。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-09-11-tensorflow-building-from-source/q11.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;参考博客&quot;&gt;参考博客&lt;/h2&gt;
+
+&lt;p&gt;&lt;a href=&quot;https://www.zhihu.com/question/46587833&quot;&gt;DL框架的未来发展，TensorFlow/MXNet/Torch, 选哪个？－知乎&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;https://www.zhihu.com/question/37243838&quot;&gt;如何评价Google发布的第二代深度学习系统TensorFlow?－知乎&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;http://blog.csdn.net/kkk584520/article/details/51476816&quot;&gt;TensorFlow 从入门到精通（一）：安装和使用&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;http://blog.csdn.net/luodongri/article/details/53870560?utm_source=itdadao&amp;amp;utm_medium=referral&quot;&gt;Tensorflow环境搭建-CSDN&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;https://www.zhihu.com/question/49909565&quot;&gt;TensorFlow 如何入门？-知乎&lt;/a&gt;&lt;br /&gt;
+&lt;a href=&quot;https://www.leiphone.com/news/201606/ORlQ7uK3TIW8xVGF.html&quot;&gt;真正从零开始，TensorFlow详细安装入门图文教程！&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+</description>
+        <pubDate>Mon, 11 Sep 2017 05:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2017/09/11/tensorflow-building-from-source/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/09/11/tensorflow-building-from-source/</guid>
+        
+        <category>源码阅读</category>
+        
+        <category>Tensorflow</category>
+        
+        <category>Deep learning</category>
+        
+        
+      </item>
     
       <item>
         <title>绕过 Windows 7 登录密码的小技巧</title>
@@ -1038,7 +1497,7 @@ $ git push          //推送到 GitHub
 &lt;/code&gt;&lt;/pre&gt;
 &lt;/div&gt;
 
-&lt;p&gt;打开浏览器，登录 http://liclong.github.io，你会看到 slate 主题的网页里。修改 index.html 文件即可进行修改。具体细节可实际摸索。&lt;/p&gt;
+&lt;p&gt;打开浏览器，登录 &lt;a href=&quot;http://liclong.github.io&quot;&gt;http://liclong.github.io&lt;/a&gt;，你会看到 slate 主题的网页里。修改 index.html 文件即可进行修改。具体细节可实际摸索。&lt;/p&gt;
 
 &lt;p&gt;注意，目前的 GitHub 进行了改版，以前各教程中提到的 theme 中的 “automatic page generator” 已经不在，大家不必纠结。&lt;/p&gt;
 
