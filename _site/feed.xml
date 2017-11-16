@@ -5,8 +5,8 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 15 Sep 2017 01:57:49 -0700</pubDate>
-    <lastBuildDate>Fri, 15 Sep 2017 01:57:49 -0700</lastBuildDate>
+    <pubDate>Wed, 15 Nov 2017 23:50:55 -0800</pubDate>
+    <lastBuildDate>Wed, 15 Nov 2017 23:50:55 -0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -771,12 +771,245 @@ print np.__path__
       </item>
     
       <item>
+        <title>查看HDFS文件物理存储路径的一两点思路</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;Key Words: Hadoop, NFS, Distributed File System&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;过程总览&quot;&gt;过程总览&lt;/h2&gt;
+
+&lt;p&gt;hdfs文件均存放在datanode上，namenode上不会存放文件。当客户上传一个文件后，namenode会先对文件作相应的处理（比如按照block大小进行分割）。这里主要讲述存放的一个整体过程以及如何快速的找到存放的节点位置信息。&lt;/p&gt;
+
+&lt;p&gt;实现namenode的源码中有一个与文件系统存储和管理有关的关键类FSNameSystem，里面有以下的一些概念：&lt;/p&gt;
+
+&lt;ol&gt;
+  &lt;li&gt;INode: 用来存放文件及目录的基本信息：名称，父节点、修改时间，访问时间以及UGI信息。 &lt;/li&gt;
+  &lt;li&gt;INodeFile: 继承自INode，除INode信息外，还有组成这个文件的Blocks列表，重复因子，Block大小 &lt;/li&gt;
+  &lt;li&gt;INodeDirectory：继承自INode，此外还有一个INode列表来组成文件或目录树结构 &lt;/li&gt;
+  &lt;li&gt;Block(BlockInfo)：组成文件的物理存储，有BlockId，size ，以及时间戳 &lt;/li&gt;
+  &lt;li&gt;BlocksMap: 保存数据块到INode和DataNode的映射关系 &lt;/li&gt;
+  &lt;li&gt;FSDirectory：保存文件树结构，HDFS整个文件系统是通过FSDirectory来管理 &lt;/li&gt;
+  &lt;li&gt;FSImage：保存的是文件系统的目录树 &lt;/li&gt;
+  &lt;li&gt;FSEditlog:  文件树上的操作日志 &lt;/li&gt;
+  &lt;li&gt;FSNamesystem: HDFS文件系统管理 &lt;/li&gt;
+&lt;/ol&gt;
+
+&lt;h3 id=&quot;思路一&quot;&gt;思路一&lt;/h3&gt;
+
+&lt;p&gt;Namenode内有两张重要的映射关系表：文件系统的命名空间，文件-block映射表。这对应了两个步骤：1. 文件按照blocksize分割成文件块 2. 文件块和block块的映射。&lt;/p&gt;
+
+&lt;p&gt;至此，我们给出一个查找文件存放位置的思路，即首先找到每个文件对应的文件块。具体来说，可以通过 workspce/hdfs/name/current 目录下的edits和fsimage文件查看。&lt;/p&gt;
+
+&lt;p&gt;注意，这里的workspace目录即为hdfs-site.xml等配置文件中所指路径。&lt;/p&gt;
+
+&lt;p&gt;通过文件块给出的block的id号找到block信息，即可找到对应位置。这中间会找到一个BlockMap，详见参考[&lt;a href=&quot;HDFS文件系统如何查看文件对应的block. http://blog.csdn.net/xuefengmiao/article/details/25025455&quot;&gt;1&lt;/a&gt;]。&lt;/p&gt;
+
+&lt;p&gt;current下主要有两大类文件 Edits 和 Fsimage([&lt;a href=&quot;Hadoop文件系统元数据fsimage和编辑日志edits：https://www.iteblog.com/archives/968.html&quot;&gt;2&lt;/a&gt;][&lt;a href=&quot;NameNode中的FSImage文件：https://www.cnblogs.com/miner007/p/3745332.html&quot;&gt;3&lt;/a&gt;]):&lt;/p&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;
+    &lt;p&gt;Fsimage(文件系统元数据)：是 Hadoop 文件系统元数据的一个永久性的检查点，其中包含Hadoop文件系统中的所有目录和文件 idnode 的序列化信息&lt;/p&gt;
+  &lt;/li&gt;
+  &lt;li&gt;
+    &lt;p&gt;Edits(编辑日志)：存放的是 Hadoop 文件系统的所有更新操作的路径，文件系统客户端执行的所有写操作首先会被记录到 edits 文件中&lt;/p&gt;
+  &lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;p&gt;直接vim上面两种文件得到的是相关的序列化信息（总之类似乱码，看不懂）；需要运用 hadoop 提供的相关机制进行查看（参考[&lt;a href=&quot;Hadoop-2.4.1学习之edits和fsimage查看器：http://blog.csdn.net/skywalker_only/article/details/40650427&quot;&gt;4&lt;/a&gt;][&lt;a href=&quot;查看fsimage和edits：http://blog.csdn.net/baolibin528/article/details/44995541&quot;&gt;5&lt;/a&gt;]）。&lt;/p&gt;
+
+&lt;p&gt;– Fsimage&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$cd ~/workspace/.../current
+$hdfs oiv -p XML -i /home/hadoop/cloud/workspace/hdfs/name/current/fsimage_xxx -o fsimage1.xml
+$vim fsimage1.xml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;– Edits&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$cd ~/workspace/.../current
+$hdfs oev -i /home/hadoop/cloud/workspace/hdfs/name/current/edits_xxx -o edits1.xml
+$vim edits.xml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;相关的fsimage和edits的资料可参见[&lt;a href=&quot;hadoop知识之fsimage和editlog：http://blog.csdn.net/maixia24/article/details/38396281&quot;&gt;6&lt;/a&gt;][&lt;a href=&quot;hdfs里的文件下载HDFS之fsimage、metadata、edits、fstime：https://www.cnblogs.com/zlslch/p/5836961.html&quot;&gt;7&lt;/a&gt;]。&lt;/p&gt;
+
+&lt;p&gt;在上面提到的datanode下的current下面会有一个BP开头的目录，里面有个current/finalized，这就是存储的各个文件块block。&lt;/p&gt;
+
+&lt;h3 id=&quot;思路二&quot;&gt;思路二&lt;/h3&gt;
+
+&lt;p&gt;Hadoop直接提供了查找datanode信息的指令fsck [&lt;a href=&quot;hdfs fsck命令查看HDFS文件对应的文件块信息(Block)和位置信息：http://lxw1234.com/archives/2015/08/452.htm&quot;&gt;8&lt;/a&gt;]&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$hdfs fsck /input -files -blocks -locations -racks
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;ul&gt;
+  &lt;li&gt;files 代表检出所有文件状态&lt;/li&gt;
+  &lt;li&gt;blocks 代表打印文件的block报告&lt;/li&gt;
+  &lt;li&gt;locations代表打印出文件存放的datanode（分成多少文件块就打印出多少条信息）&lt;/li&gt;
+  &lt;li&gt;racks代表打印出存放的机架位置&lt;/li&gt;
+&lt;/ul&gt;
+
+&lt;hr /&gt;
+
+</description>
+        <pubDate>Fri, 24 Mar 2017 05:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2017/03/24/hadoop-fsimage/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/03/24/hadoop-fsimage/</guid>
+        
+        <category>Big Data</category>
+        
+        <category>Hadoop</category>
+        
+        
+      </item>
+    
+      <item>
+        <title>如何实现分布式文件系统HDFS到本地Linux文件系统的映射</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;Key Words: Hadoop, NFS, Distributed File System&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;h2 id=&quot;为什么需要文件系统间的映射&quot;&gt;为什么需要文件系统间的映射&lt;/h2&gt;
+
+&lt;p&gt;hdfs是分布式系统，要想访问hdfs上的文件，可以用java api或者hadoop shell等工具。遗憾的是，很多应用包无法直接调用这些api，因此，如果想操作hdfs文件系统就像操作本地文件系统一样的便捷，实现两者之间的映射是我们想到的最好的解决方案。&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-20-hadoop-dfs-nfs-lfs/architecture.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;h2 id=&quot;已有解决方案介绍&quot;&gt;已有解决方案介绍&lt;/h2&gt;
+
+&lt;p&gt;目前已有解决方案有三种。其中，《Hadoop权威指南》一书中提到，可以通过Fuse－DFS和WebDEV两种途径实现，如下所示：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-20-hadoop-dfs-nfs-lfs/fuse2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;遗憾的是，楼长在部署时发现上述方式过于繁琐。相较之下，第三种解决方案：NFS挂载，则更为实用。&lt;/p&gt;
+
+&lt;h2 id=&quot;基于nfs的解决方案实践&quot;&gt;基于NFS的解决方案实践&lt;/h2&gt;
+
+&lt;p&gt;为通过NFS技术实现HDFS到本地的挂载，进而完成映射，我们分两步走。&lt;/p&gt;
+
+&lt;p&gt;一. 本地目录到本地目录的挂载&lt;/p&gt;
+
+&lt;p&gt;首先需要安装nfs服务&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$sudo apt-get install nfs-kernel-server
+$sudo apt-get install nfs-client
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;安装完成后，更新/etc/exports文件，并在最后添加如下一行：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;/ *(insecure, rw, async, no_root_squash)
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;其中，“／”表示准备被挂载的目录， “＊”对应允许挂载的IP地址，这里表示所有。&lt;/p&gt;
+
+&lt;p&gt;安装完成后，启动nfs服务：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$sudo /etc/init.d/rpcbind start
+$sudo /etc/init.d/nfs-kernel-server start
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;最后，实现挂载。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$sudo mount 192.168.0.123:/input /mnt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;二. HDFS到本地目录的挂载&lt;/p&gt;
+
+&lt;p&gt;这一部分是实际操作中bug频出的地方，归根结底是配置文件的错误。对core-site.xml和hdfs-site.xml两大文件，分别添加如下内容：&lt;/p&gt;
+
+&lt;p&gt;– core-site.xml&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;property&amp;gt;
+&amp;lt;name&amp;gt;hadoop.proxyuser.root.groups&amp;lt;/name&amp;gt;
+&amp;lt;value&amp;gt;*&amp;lt;/value&amp;gt;
+&amp;lt;/property&amp;gt;
+
+&amp;lt;property&amp;gt;
+&amp;lt;name&amp;gt;hadoop.proxyuser.root.hosts&amp;lt;/name&amp;gt;
+&amp;lt;value&amp;gt;192.168.0.123&amp;lt;/value&amp;gt;
+&amp;lt;/property&amp;gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;注意，这里&lt;name&gt;标签里的“root”，在很多教程里写成“nfsserver”或&quot;hadoop&quot;，在楼长的实际操作中，只有“root”不报错。&lt;/name&gt;&lt;/p&gt;
+
+&lt;p&gt;– hdfs-site.xml&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;lt;property&amp;gt;
+&amp;lt;name&amp;gt;dfs.namenode.accesstime.precision&amp;lt;/name&amp;gt;
+&amp;lt;value&amp;gt;3600000&amp;lt;/value&amp;gt;
+&amp;lt;/property&amp;gt;
+
+&amp;lt;property&amp;gt;
+&amp;lt;name&amp;gt;nfs.dump.dir&amp;lt;/name&amp;gt;
+&amp;lt;value&amp;gt;/tmp/.hdfs-nfs&amp;lt;/value&amp;gt;
+&amp;lt;/property&amp;gt;
+
+&amp;lt;property&amp;gt;
+&amp;lt;name&amp;gt;nfs.exports.allowed.hosts&amp;lt;/name&amp;gt;
+&amp;lt;value&amp;gt;* rw&amp;lt;/value&amp;gt;
+&amp;lt;/property&amp;gt;
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;配置文件更新后，同步到各节点，并启动集群。&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$sbin/start-all.sh
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;使用以下命令启动hadoop中的nfs服务：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$sudo /etc/init.d/nfs-kernel-server stop
+$sudo /etc/init.d/rpcbind stop
+$sudo ./hadoop-daemon.sh start portmap
+$sudo ./hadoop-daemon.sh start nfs3
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;查看是否成功：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$sudo rpcinfo -p 192.168.0.123
+$sudo showmount -e 192.168.0.123
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;服务启起来之后，实现挂载：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$sudo mount -t nfs -o vers=3,proto=tcp,nolock,noacl 192.168.0.123:/ /mnt
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;hr /&gt;
+
+</description>
+        <pubDate>Mon, 20 Mar 2017 05:00:00 -0700</pubDate>
+        <link>http://localhost:4000/2017/03/20/hadoop-dfs-nfs-lfs/</link>
+        <guid isPermaLink="true">http://localhost:4000/2017/03/20/hadoop-dfs-nfs-lfs/</guid>
+        
+        <category>Big Data</category>
+        
+        <category>Hadoop</category>
+        
+        
+      </item>
+    
+      <item>
         <title>「51CTO」Hadoop平台与开发环境搭建</title>
         <description>&lt;blockquote&gt;
   &lt;p&gt;文章转自我在 51CTO 的一篇网络课程，如下是楼长 2014 年录的一段操作视频，供大家参考。&lt;/p&gt;
 &lt;/blockquote&gt;
 
-&lt;p&gt;&lt;a href=&quot;https://pan.baidu.com/s/1jI9htgq&quot;&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-video.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
+&lt;p&gt;&lt;a href=&quot;https://pan.baidu.com/s/1jI9htgq&quot;&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-video.png&quot; alt=&quot;&quot; /&gt;&lt;/a&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;准备工作&quot;&gt;准备工作&lt;/h2&gt;
 
@@ -1083,7 +1316,7 @@ export JAVA_HOME=/usr/lib/jvm/java-7-sun
 
 &lt;p&gt;11. 登录 10.0.1.27:8080 可查看资源管理页面&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-login.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-login.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;运行示例程序&quot;&gt;运行示例程序&lt;/h2&gt;
 
@@ -1243,7 +1476,7 @@ There are 0 datanode(s) running and no node(s) are excluded in this operation.
 
 &lt;p&gt;这里在 Windows 下搭建开发环境，在基于 Ubuntu 的集群上运行，架构如图所示。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-os.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-os.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;1. 安装 JDK 环境&lt;/p&gt;
 
@@ -1255,27 +1488,27 @@ There are 0 datanode(s) running and no node(s) are excluded in this operation.
 
 &lt;p&gt;3. 新建工程&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-new-project.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-new-project.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;4. 新建 package&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-new-package.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-new-package.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;5. 导入 jar 包&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-import.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-import.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;6. 编写代码&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-coding.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-coding.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;7. 编译程序&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-export1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-export1.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;8. 导出程序&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-16-hadoop-implementation/hadoop-export2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-16-hadoop-implementation/hadoop-export2.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;9. 将 jar 包复制到 Master 节点，跳转到 Master 的 Hadoop 目录，执行：&lt;/p&gt;
 
@@ -1292,7 +1525,7 @@ There are 0 datanode(s) running and no node(s) are excluded in this operation.
         
         <category>Big Data</category>
         
-        <category>MapReduce</category>
+        <category>Hadoop</category>
         
         
       </item>
@@ -1360,13 +1593,13 @@ There are 0 datanode(s) running and no node(s) are excluded in this operation.
 
 &lt;p&gt;首先进入GitHub并申请账号，Google输入github，点击第一条进入，如下图。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/google-github.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-11-the-first-blog/google-github.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;想了解GitHub的童鞋可参见知乎：&lt;a href=&quot;https://www.zhihu.com/question/19968479/&quot;&gt;https://www.zhihu.com/question/19968479/&lt;/a&gt;。&lt;/p&gt;
 
 &lt;p&gt;进入GitHub主页后请首先注册账号。并创建一个 Repositories，命名为”&lt;em&gt;username&lt;/em&gt;.github.io”。注意，这里，&lt;em&gt;username&lt;/em&gt; 是你刚才注册的 GitHub 账号名，我的账号名是 &lt;b&gt;&lt;em&gt;liclong&lt;/em&gt;&lt;/b&gt;，因此这里填: “&lt;b&gt;&lt;em&gt;liclong&lt;/em&gt;&lt;/b&gt;.github.io”。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-repositories.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-11-the-first-blog/github-repositories.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;&lt;b&gt;二、建立本地与GitHub的连接&lt;/b&gt;&lt;/p&gt;
 
@@ -1402,7 +1635,7 @@ $ git config --global user.email &quot;youemail@gmail.com&quot;
 
 &lt;p&gt;点击右上角的账户设定按钮（Account Settings），选择 SSH and GPG Keys 菜单，就会出现如下界面。点击 Add SSH Key，会出现 Title 和 Key 两个输入框。在 Title 中输入适当的密钥名称，Key 部分粘贴 id_rsa.pub 文件里的内容。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-sshkey.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-11-the-first-blog/github-sshkey.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;如此一来，本地电脑和远端的 GitHub 服务器就建立了可信的连接。以后可以通过 git 命令快捷的从 GitHub 克隆项目，并将修改后的项目更新到 GitHub。&lt;/p&gt;
 
@@ -1443,7 +1676,7 @@ $ git push                  //现在，GitHub 上的仓库被更新了
 
 &lt;p&gt;打开你的浏览器，输入你刚建的 Repository 的文件名，例如我的是 liclong.github.io。如下图所示，You get it!&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-link.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-11-the-first-blog/github-link.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;说白了，GitHub 提供了这样一种页面解析功能，你既可以拿它制作博客，也可以拿它做个人主页，功能就在那里，用途任你选择。详情可参考 &lt;a href=&quot;https://pages.github.com/&quot;&gt;GitHub Pages&lt;/a&gt; 官方主页。&lt;/p&gt;
 
@@ -1482,11 +1715,11 @@ gem 'github-pages'
 
 &lt;p&gt;随后，进入 liclong.github.io 仓库，并点击菜单栏中的 Settings。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-theme.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-11-the-first-blog/github-theme.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;在 theme 中，选择你喜欢的主题。这里我们以 slate 主题为例，如下图所示。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-slate.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-11-the-first-blog/github-slate.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;p&gt;可以查看它在 GitHub 中的代码，并 git clone 到本地。现在将里面的代码全部复制到本地的 liclong.git.io 目录，文件名重复的直接 replace。然后，进入 liclong.github.io 目录，并执行：&lt;/p&gt;
 
@@ -1501,7 +1734,7 @@ $ git push          //推送到 GitHub
 
 &lt;p&gt;注意，目前的 GitHub 进行了改版，以前各教程中提到的 theme 中的 “automatic page generator” 已经不在，大家不必纠结。&lt;/p&gt;
 
-&lt;p&gt;&lt;img src=&quot;/img/2017-04-11-the-first-blog/github-answer.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+&lt;p&gt;&lt;img src=&quot;/img/2017-03-11-the-first-blog/github-answer.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
 
 &lt;h2 id=&quot;结语&quot;&gt;结语&lt;/h2&gt;
 

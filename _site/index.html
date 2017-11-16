@@ -276,6 +276,60 @@ Before that, 两个问题需要回答：
 <hr>
 
 <div class="post-preview">
+    <a href="/2017/03/24/hadoop-fsimage/">
+        <h2 class="post-title">
+            查看HDFS文件物理存储路径的一两点思路
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            
+  Key Words: Hadoop, NFS, Distributed File System
+
+
+过程总览
+
+hdfs文件均存放在datanode上，namenode上不会存放文件。当客户上传一个文件后，namenode会先对文件作相应的处理（比如按照block大小进行分割）。这里主要讲述存放的一个整体过程以及如何快速的找到存放的节点位置信息。
+
+实现namenode的源码中有一个与...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Chris on March 24, 2017
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
+    <a href="/2017/03/20/hadoop-dfs-nfs-lfs/">
+        <h2 class="post-title">
+            如何实现分布式文件系统HDFS到本地Linux文件系统的映射
+        </h2>
+        
+        <h3 class="post-subtitle">
+            
+        </h3>
+        
+        <div class="post-content-preview">
+            
+  Key Words: Hadoop, NFS, Distributed File System
+
+
+为什么需要文件系统间的映射
+
+hdfs是分布式系统，要想访问hdfs上的文件，可以用java api或者hadoop shell等工具。遗憾的是，很多应用包无法直接调用这些api，因此，如果想操作hdfs文件系统就像操作本地文件系统一样的便捷，实现两者之间的映射是我们想到的最好的解决方案...
+        </div>
+    </a>
+    <p class="post-meta">
+        Posted by Chris on March 20, 2017
+    </p>
+</div>
+<hr>
+
+<div class="post-preview">
     <a href="/2017/03/16/hadoop-implementation/">
         <h2 class="post-title">
             「51CTO」Hadoop平台与开发环境搭建
@@ -361,7 +415,15 @@ Before that, 两个问题需要回答：
                             
                         
                             
+                                <a href="/tags/#Big Data" title="Big Data" rel="3">
+                                    Big Data
+                                </a>
+                            
                         
+                            
+                                <a href="/tags/#Hadoop" title="Hadoop" rel="3">
+                                    Hadoop
+                                </a>
                             
                         
                             

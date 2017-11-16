@@ -73,13 +73,13 @@ tags:
 
 首先进入GitHub并申请账号，Google输入github，点击第一条进入，如下图。
 
-![](/img/2017-04-11-the-first-blog/google-github.png)
+![](/img/2017-03-11-the-first-blog/google-github.png)
 
 想了解GitHub的童鞋可参见知乎：<https://www.zhihu.com/question/19968479/>。
 
 进入GitHub主页后请首先注册账号。并创建一个 Repositories，命名为"*username*.github.io"。注意，这里，*username* 是你刚才注册的 GitHub 账号名，我的账号名是 <b>*liclong*</b>，因此这里填: "<b>*liclong*</b>.github.io"。
 
-![](/img/2017-04-11-the-first-blog/github-repositories.png)
+![](/img/2017-03-11-the-first-blog/github-repositories.png)
 
 <b>二、建立本地与GitHub的连接</b>
 
@@ -115,7 +115,7 @@ $ ssh-keygen -t rsa -C "youremail@gmail.com"
 
 点击右上角的账户设定按钮（Account Settings），选择 SSH and GPG Keys 菜单，就会出现如下界面。点击 Add SSH Key，会出现 Title 和 Key 两个输入框。在 Title 中输入适当的密钥名称，Key 部分粘贴 id_rsa.pub 文件里的内容。
 
-![](/img/2017-04-11-the-first-blog/github-sshkey.png)
+![](/img/2017-03-11-the-first-blog/github-sshkey.png)
 
 如此一来，本地电脑和远端的 GitHub 服务器就建立了可信的连接。以后可以通过 git 命令快捷的从 GitHub 克隆项目，并将修改后的项目更新到 GitHub。
 
@@ -156,7 +156,7 @@ $ git push                  //现在，GitHub 上的仓库被更新了
 
 打开你的浏览器，输入你刚建的 Repository 的文件名，例如我的是 liclong.github.io。如下图所示，You get it!
 
-![](/img/2017-04-11-the-first-blog/github-link.png)
+![](/img/2017-03-11-the-first-blog/github-link.png)
 
 说白了，GitHub 提供了这样一种页面解析功能，你既可以拿它制作博客，也可以拿它做个人主页，功能就在那里，用途任你选择。详情可参考 [GitHub Pages][2] 官方主页。
 
@@ -195,11 +195,11 @@ $ bundle exec jekyll serve
 
 随后，进入 liclong.github.io 仓库，并点击菜单栏中的 Settings。
 
-![](/img/2017-04-11-the-first-blog/github-theme.png)
+![](/img/2017-03-11-the-first-blog/github-theme.png)
 
 在 theme 中，选择你喜欢的主题。这里我们以 slate 主题为例，如下图所示。
 
-![](/img/2017-04-11-the-first-blog/github-slate.png)
+![](/img/2017-03-11-the-first-blog/github-slate.png)
 
 可以查看它在 GitHub 中的代码，并 git clone 到本地。现在将里面的代码全部复制到本地的 liclong.git.io 目录，文件名重复的直接 replace。然后，进入 liclong.github.io 目录，并执行：
 
@@ -214,7 +214,7 @@ $ git push          //推送到 GitHub
 
 注意，目前的 GitHub 进行了改版，以前各教程中提到的 theme 中的 "automatic page generator" 已经不在，大家不必纠结。
 
-![](/img/2017-04-11-the-first-blog/github-answer.png)
+![](/img/2017-03-11-the-first-blog/github-answer.png)
 
 ## 结语
 

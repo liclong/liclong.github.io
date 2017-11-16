@@ -9,12 +9,12 @@ header-mask: 0.3
 catalog:    true
 tags:
     - Big Data
-    - MapReduce
+    - Hadoop
 ---
 
 > 文章转自我在 51CTO 的一篇网络课程，如下是楼长 2014 年录的一段操作视频，供大家参考。
 
-[![](/img/2017-04-16-hadoop-implementation/hadoop-video.png)][1]
+[![](/img/2017-03-16-hadoop-implementation/hadoop-video.png)][1]
 
 ## 准备工作
 
@@ -302,7 +302,7 @@ export JAVA_HOME=/usr/lib/jvm/java-7-sun
 
 11.&nbsp;登录 10.0.1.27:8080 可查看资源管理页面
 
-![](/img/2017-04-16-hadoop-implementation/hadoop-login.png)
+![](/img/2017-03-16-hadoop-implementation/hadoop-login.png)
 
 
 ## 运行示例程序
@@ -465,7 +465,7 @@ Namenode 正常启动,但子节点的 datanode 无法正常启动
 
 这里在 Windows 下搭建开发环境，在基于 Ubuntu 的集群上运行，架构如图所示。
 
-![](/img/2017-04-16-hadoop-implementation/hadoop-os.png)
+![](/img/2017-03-16-hadoop-implementation/hadoop-os.png)
 
 1.&nbsp;安装 JDK 环境
 
@@ -477,27 +477,27 @@ Namenode 正常启动,但子节点的 datanode 无法正常启动
 
 3.&nbsp;新建工程
 
-![](/img/2017-04-16-hadoop-implementation/hadoop-new-project.png)
+![](/img/2017-03-16-hadoop-implementation/hadoop-new-project.png)
 
 4.&nbsp;新建 package
 
-![](/img/2017-04-16-hadoop-implementation/hadoop-new-package.png)
+![](/img/2017-03-16-hadoop-implementation/hadoop-new-package.png)
 
 5.&nbsp;导入 jar 包
 
-![](/img/2017-04-16-hadoop-implementation/hadoop-import.png)
+![](/img/2017-03-16-hadoop-implementation/hadoop-import.png)
 
 6.&nbsp;编写代码
 
-![](/img/2017-04-16-hadoop-implementation/hadoop-coding.png)
+![](/img/2017-03-16-hadoop-implementation/hadoop-coding.png)
 
 7.&nbsp;编译程序
 
-![](/img/2017-04-16-hadoop-implementation/hadoop-export1.png)
+![](/img/2017-03-16-hadoop-implementation/hadoop-export1.png)
 
 8.&nbsp;导出程序
 
-![](/img/2017-04-16-hadoop-implementation/hadoop-export2.png)
+![](/img/2017-03-16-hadoop-implementation/hadoop-export2.png)
 
 9.&nbsp;将 jar 包复制到 Master 节点，跳转到 Master 的 Hadoop 目录，执行：
 

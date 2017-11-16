@@ -10,7 +10,7 @@
     <meta name="keywords"  content="Coop, 云计算, ChrisLi, 极客, @liclong, 楼长de博客, Chris‘ Blog, 互联网, 设计, 产品，USTC, UCLA, 智慧城市">
     <meta name="theme-color" content="#000000">
     
-    <title>About - 来自COOP楼长的博客 | Chris' Blog</title>
+    <title>查看HDFS文件物理存储路径的一两点思路 - 来自COOP楼长的博客 | Chris' Blog</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/about/">
+    <link rel="canonical" href="http://localhost:4000/2017/03/24/hadoop-fsimage/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -149,143 +149,267 @@
 </script>
 
 
-    <!-- Page Header -->
-<header class="intro-header" style="background-image: url('/img/post-bg-digital-native.jpg')">
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/home-bg-art.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg-art.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.3);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
-                <div class="site-heading">
-                    <h1>About</h1>
-                    <!--<hr class="small">-->
-                    <span class="subheading">Hey, this is Chris.</span>
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Big Data" title="Big Data">Big Data</a>
+                        
+                        <a class="tag" href="/tags/#Hadoop" title="Hadoop">Hadoop</a>
+                        
+                    </div>
+                    <h1>查看HDFS文件物理存储路径的一两点思路</h1>
+                    
+                    
+                    <h2 class="subheading"></h2>
+                    
+                    <span class="meta">Posted by Chris on March 24, 2017</span>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- Main Content -->
-<div class="container">
-	<div class="row">
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>Key Words: Hadoop, NFS, Distributed File System</p>
+</blockquote>
+
+<h2 id="过程总览">过程总览</h2>
+
+<p>hdfs文件均存放在datanode上，namenode上不会存放文件。当客户上传一个文件后，namenode会先对文件作相应的处理（比如按照block大小进行分割）。这里主要讲述存放的一个整体过程以及如何快速的找到存放的节点位置信息。</p>
+
+<p>实现namenode的源码中有一个与文件系统存储和管理有关的关键类FSNameSystem，里面有以下的一些概念：</p>
+
+<ol>
+  <li>INode: 用来存放文件及目录的基本信息：名称，父节点、修改时间，访问时间以及UGI信息。 </li>
+  <li>INodeFile: 继承自INode，除INode信息外，还有组成这个文件的Blocks列表，重复因子，Block大小 </li>
+  <li>INodeDirectory：继承自INode，此外还有一个INode列表来组成文件或目录树结构 </li>
+  <li>Block(BlockInfo)：组成文件的物理存储，有BlockId，size ，以及时间戳 </li>
+  <li>BlocksMap: 保存数据块到INode和DataNode的映射关系 </li>
+  <li>FSDirectory：保存文件树结构，HDFS整个文件系统是通过FSDirectory来管理 </li>
+  <li>FSImage：保存的是文件系统的目录树 </li>
+  <li>FSEditlog:  文件树上的操作日志 </li>
+  <li>FSNamesystem: HDFS文件系统管理 </li>
+</ol>
+
+<h3 id="思路一">思路一</h3>
+
+<p>Namenode内有两张重要的映射关系表：文件系统的命名空间，文件-block映射表。这对应了两个步骤：1. 文件按照blocksize分割成文件块 2. 文件块和block块的映射。</p>
+
+<p>至此，我们给出一个查找文件存放位置的思路，即首先找到每个文件对应的文件块。具体来说，可以通过 workspce/hdfs/name/current 目录下的edits和fsimage文件查看。</p>
+
+<p>注意，这里的workspace目录即为hdfs-site.xml等配置文件中所指路径。</p>
+
+<p>通过文件块给出的block的id号找到block信息，即可找到对应位置。这中间会找到一个BlockMap，详见参考[<a href="HDFS文件系统如何查看文件对应的block. http://blog.csdn.net/xuefengmiao/article/details/25025455">1</a>]。</p>
+
+<p>current下主要有两大类文件 Edits 和 Fsimage([<a href="Hadoop文件系统元数据fsimage和编辑日志edits：https://www.iteblog.com/archives/968.html">2</a>][<a href="NameNode中的FSImage文件：https://www.cnblogs.com/miner007/p/3745332.html">3</a>]):</p>
+
+<ul>
+  <li>
+    <p>Fsimage(文件系统元数据)：是 Hadoop 文件系统元数据的一个永久性的检查点，其中包含Hadoop文件系统中的所有目录和文件 idnode 的序列化信息</p>
+  </li>
+  <li>
+    <p>Edits(编辑日志)：存放的是 Hadoop 文件系统的所有更新操作的路径，文件系统客户端执行的所有写操作首先会被记录到 edits 文件中</p>
+  </li>
+</ul>
+
+<p>直接vim上面两种文件得到的是相关的序列化信息（总之类似乱码，看不懂）；需要运用 hadoop 提供的相关机制进行查看（参考[<a href="Hadoop-2.4.1学习之edits和fsimage查看器：http://blog.csdn.net/skywalker_only/article/details/40650427">4</a>][<a href="查看fsimage和edits：http://blog.csdn.net/baolibin528/article/details/44995541">5</a>]）。</p>
+
+<p>– Fsimage</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$cd ~/workspace/.../current
+$hdfs oiv -p XML -i /home/hadoop/cloud/workspace/hdfs/name/current/fsimage_xxx -o fsimage1.xml
+$vim fsimage1.xml
+</code></pre>
+</div>
+
+<p>– Edits</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$cd ~/workspace/.../current
+$hdfs oev -i /home/hadoop/cloud/workspace/hdfs/name/current/edits_xxx -o edits1.xml
+$vim edits.xml
+</code></pre>
+</div>
+
+<p>相关的fsimage和edits的资料可参见[<a href="hadoop知识之fsimage和editlog：http://blog.csdn.net/maixia24/article/details/38396281">6</a>][<a href="hdfs里的文件下载HDFS之fsimage、metadata、edits、fstime：https://www.cnblogs.com/zlslch/p/5836961.html">7</a>]。</p>
+
+<p>在上面提到的datanode下的current下面会有一个BP开头的目录，里面有个current/finalized，这就是存储的各个文件块block。</p>
+
+<h3 id="思路二">思路二</h3>
+
+<p>Hadoop直接提供了查找datanode信息的指令fsck [<a href="hdfs fsck命令查看HDFS文件对应的文件块信息(Block)和位置信息：http://lxw1234.com/archives/2015/08/452.htm">8</a>]</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$hdfs fsck /input -files -blocks -locations -racks
+</code></pre>
+</div>
+
+<ul>
+  <li>files 代表检出所有文件状态</li>
+  <li>blocks 代表打印文件的block报告</li>
+  <li>locations代表打印出文件存放的datanode（分成多少文件块就打印出多少条信息）</li>
+  <li>racks代表打印出存放的机架位置</li>
+</ul>
+
+<hr />
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/03/20/hadoop-dfs-nfs-lfs/" data-toggle="tooltip" data-placement="top" title="如何实现分布式文件系统HDFS到本地Linux文件系统的映射">
+                        Previous<br>
+                        <span>如何实现分布式文件系统HDFS到本地Linux文件系统的映射</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2017/04/17/shadowsocks/" data-toggle="tooltip" data-placement="top" title="利用 Shadowsocks 观看完整版「人民的名义」">
+                        Next<br>
+                        <span>利用 Shadowsocks 观看完整版「人民的名义」</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
         
 
-<!-- USE SIDEBAR -->
-    <!-- PostList Container -->
-    		<div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                postlist-container
-            ">
-    			<!-- Language Selector -->
-<select class="sel-lang" onchange= "onLanChange(this.options[this.options.selectedIndex].value)">
-    <option value="0" selected> 中文 Chinese </option>
-    <option value="1"> 英文 English </option>
-</select>
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
 
-<!-- Chinese Version -->
-<div class="zh post-container">
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Big Data" title="Big Data" rel="3">
+                                    Big Data
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Hadoop" title="Hadoop" rel="3">
+                                    Hadoop
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
 
-    <!--copied from markdown -->
-    <blockquote><p>Stay foolish, Stay hungry.</p></blockquote>
-
-    <p>Hey，我是<strong>李昌龙</strong>，码农 &amp; 搬砖工，曾就读于<a href="http://www.ustc.edu.cn/">USTC</a>和<a href="http://www.ucla.edu/">UCLA</a>，博士。</p>
-
-    <p>一些作品和开源项目，请戳 <a href="http://github.com/liclong">Github</a>。</p>
-    
-    <p>音乐重度依赖患者，设计师强迫症患者，书买得比看得多患者，毒舌患者，科技产品发布会观看癖患者，间歇性感伤患者，习惯性熬夜患者。</p>
-    <!--
-    <h5>Talks</h5>
-
-    <ul>
-    <li><a href="//huangxuan.me/2016/11/20/sw-101-gdgdf/">Service Worker 101</a> · GDG DevFest 北京 2016</li>
-    <li><a href="//huangxuan.me/2016/10/20/pwa-qcon2016/">Progressive Web Apps 复兴序章</a> · <a href="http://2016.qconshanghai.com/presentation/3111">QCon 上海 2016</a></li>
-    <li><a href="//huangxuan.me/2016/06/05/pwa-in-my-pov/">Progressive Web App 之我见</a> · IO Redux 北京 2016</li>
-    <li><a href="//huangxuan.me/2015/12/28/css-sucks-2015/">CSS Still Sucks 2015</a> · 2015</li>
-    <li><a href="//huangxuan.me/2015/07/09/js-module-7day/">JavaScript 模块化七日谈</a> · 2015</li>
-    </ul>
-     -->
-</div>
-
-<!-- English Version -->
-<div class="en post-container">
-    <blockquote><p>Stay foolish, Stay hungry.</p></blockquote>
-
-    <p>Hi, I am <strong>Changlong Li (李昌龙)</strong>，you can call me <strong>Chris</strong>. I'm a PHD of USTC and UCLA. I am a designer who builds softwares on <a href="http://github.com/liclong">Github</a>.</p>
-
-<!--
-    <h5>Talks</h5>
-    <ul>
-    <li><a href="//huangxuan.me/2016/11/20/sw-101-gdgdf/" title="Service Worker 101 - working offline and instant loading">Service Worker 101</a> · GDG DevFest Beijing 2016</li>
-    <li><a href="//huangxuan.me/2016/10/20/pwa-qcon2016/" title="Progressive Web Apps - make web great again">Progressive Web Apps</a> · QCon Shanghai 2016</li>
-    <li><a href="//huangxuan.me/2016/06/05/pwa-in-my-pov/" title="Progressive Web App in my point of view">Progressive Web App in my POV</a> · IO Redux Beijing 2016</li>
-    <li><a href="//huangxuan.me/2015/12/28/css-sucks-2015/" title="CSS Still Sucks 2015 - and how we work around it">CSS Still Sucks 2015</a> · 2015</li>
-    <li><a href="//huangxuan.me/2015/07/09/js-module-7day/">JavaScript Modularization Journey</a> · 2015</li>
-    </ul>
--->
-</div>
-
-<!-- Handle Language Change -->
-<script type="text/javascript">
-    // get nodes
-    var $zh = document.querySelector(".zh");
-    var $en = document.querySelector(".en");
-    var $select = document.querySelector("select");
-
-    // bind hashchange event
-    window.addEventListener('hashchange', _render);
-
-    // handle render
-    function _render(){
-        var _hash = window.location.hash;
-        // en
-        if(_hash == "#en"){
-            $select.selectedIndex = 1;
-            $en.style.display = "block";
-            $zh.style.display = "none";
-        // zh by default
-        }else{
-            // not trigger onChange, otherwise cause a loop call.
-            $select.selectedIndex = 0;
-            $zh.style.display = "block";
-            $en.style.display = "none";
-        }
-    }
-
-    // handle select change
-    function onLanChange(index){
-        if(index == 0){
-            window.location.hash = "#zh"
-        }else{
-            window.location.hash = "#en"
-        }
-    }
-
-    // init
-    _render();
-</script>
-
-
-
-
-
-
-
-<!-- disqus 评论框 start -->
-<div class="comment">
-    <div id="disqus_thread" class="disqus-thread">
-
+                <!-- Friends Blog -->
+                <!--
+                
+                 -->
+            </div>
+        </div>
     </div>
-</div>
-<!-- disqus 评论框 end -->
+</article>
+
+
+
+
+
 
 <!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "liclong";
-    var disqus_identifier = "liclong//about/";
-    var disqus_url = "http://localhost:4000/about/";
+    var disqus_identifier = "/2017/03/24/hadoop-fsimage";
+    var disqus_url = "http://localhost:4000/2017/03/24/hadoop-fsimage/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
@@ -296,126 +420,46 @@
 <!-- disqus 公共JS代码 end -->
 
 
-    		</div>
-    <!-- Sidebar Container -->
-            <div class="
-                col-lg-3 col-lg-offset-0
-                col-md-3 col-md-offset-0
-                col-sm-12
-                col-xs-12
-                sidebar-container
-            ">
-            
-                <!-- Featured Tags -->
-                <!--
-                
-                <section>
-                    <hr class="hidden-sm hidden-xs">
-                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-                    <div class="tags">
-                        
-                            
-                        
-                            
-                        
-                            
-                                <a href="/tags/#Big Data" title="Big Data" rel="3">
-                                    Big Data
-                                </a>
-                            
-                        
-                            
-                                <a href="/tags/#Hadoop" title="Hadoop" rel="3">
-                                    Hadoop
-                                </a>
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                    </div>
-                </section>
-                
-                 -->
 
-                <!-- Short About -->
-                <section class="visible-md visible-lg">
-                    <hr><h5><a href="/about/">ABOUT ME</a></h5>
-                    <div class="short-about">
-                        
-                            <img src="/img/weibo-id.png" />
-                        
-                        
-                            <p>Stay foolish, Stay hungry!<br>这里是楼长的博客，与你一起发现更远的世界。</p>
-                        
-                        <!-- SNS Link -->
-                        <ul class="list-inline">
-                            
-                            
-                            
-                            <li>
-                                <a target="_blank" href="http://weibo.com/来自COOP的楼长">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://www.facebook.com/100010765389727">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://github.com/liclong">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://www.linkedin.com/in/changlong-li-272a1bba">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                </section>
-                
-    		</div>
-        
-	</div>
-</div>
 
-<hr style="filter: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color="#987cb9" size="3">
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
 <div style="text-align:center;">
-    <span id="busuanzi_container_site_pv">
-        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    <span id="busuanzi_container_page_pv">
+        本文总阅读量<span id="busuanzi_value_page_pv"></span>次
     </span>
 </div>
 
@@ -563,6 +607,50 @@
 
 
 <!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
 
 
 <!--显示访问量-->

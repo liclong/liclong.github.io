@@ -10,7 +10,7 @@
     <meta name="keywords"  content="Coop, 云计算, ChrisLi, 极客, @liclong, 楼长de博客, Chris‘ Blog, 互联网, 设计, 产品，USTC, UCLA, 智慧城市">
     <meta name="theme-color" content="#000000">
     
-    <title>About - 来自COOP楼长的博客 | Chris' Blog</title>
+    <title>如何实现分布式文件系统HDFS到本地Linux文件系统的映射 - 来自COOP楼长的博客 | Chris' Blog</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/about/">
+    <link rel="canonical" href="http://localhost:4000/2017/03/20/hadoop-dfs-nfs-lfs/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -149,143 +149,308 @@
 </script>
 
 
-    <!-- Page Header -->
-<header class="intro-header" style="background-image: url('/img/post-bg-digital-native.jpg')">
+    <!-- Image to hack wechat -->
+<!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
+<!-- <img src="/img/home-bg-art.jpg" width="0" height="0"> -->
+
+<!-- Post Header -->
+<style type="text/css">
+    header.intro-header{
+        position: relative;
+        background-image: url('/img/home-bg-art.jpg')
+    }
+
+    
+    header.intro-header .header-mask{
+        width: 100%;
+        height: 100%;
+        position: absolute;
+        background: rgba(0,0,0, 0.3);
+    }
+    
+</style>
+<header class="intro-header" >
+    <div class="header-mask"></div>
     <div class="container">
         <div class="row">
-            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1 ">
-                <div class="site-heading">
-                    <h1>About</h1>
-                    <!--<hr class="small">-->
-                    <span class="subheading">Hey, this is Chris.</span>
+            <div class="col-lg-8 col-lg-offset-2 col-md-10 col-md-offset-1">
+                <div class="post-heading">
+                    <div class="tags">
+                        
+                        <a class="tag" href="/tags/#Big Data" title="Big Data">Big Data</a>
+                        
+                        <a class="tag" href="/tags/#Hadoop" title="Hadoop">Hadoop</a>
+                        
+                    </div>
+                    <h1>如何实现分布式文件系统HDFS到本地Linux文件系统的映射</h1>
+                    
+                    
+                    <h2 class="subheading"></h2>
+                    
+                    <span class="meta">Posted by Chris on March 20, 2017</span>
                 </div>
             </div>
         </div>
     </div>
 </header>
 
-<!-- Main Content -->
-<div class="container">
-	<div class="row">
+<!-- Post Content -->
+<article>
+    <div class="container">
+        <div class="row">
+
+    <!-- Post Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                post-container">
+
+				<blockquote>
+  <p>Key Words: Hadoop, NFS, Distributed File System</p>
+</blockquote>
+
+<h2 id="为什么需要文件系统间的映射">为什么需要文件系统间的映射</h2>
+
+<p>hdfs是分布式系统，要想访问hdfs上的文件，可以用java api或者hadoop shell等工具。遗憾的是，很多应用包无法直接调用这些api，因此，如果想操作hdfs文件系统就像操作本地文件系统一样的便捷，实现两者之间的映射是我们想到的最好的解决方案。</p>
+
+<p><img src="/img/2017-03-20-hadoop-dfs-nfs-lfs/architecture.png" alt="" /></p>
+
+<h2 id="已有解决方案介绍">已有解决方案介绍</h2>
+
+<p>目前已有解决方案有三种。其中，《Hadoop权威指南》一书中提到，可以通过Fuse－DFS和WebDEV两种途径实现，如下所示：</p>
+
+<p><img src="/img/2017-03-20-hadoop-dfs-nfs-lfs/fuse2.png" alt="" /></p>
+
+<p>遗憾的是，楼长在部署时发现上述方式过于繁琐。相较之下，第三种解决方案：NFS挂载，则更为实用。</p>
+
+<h2 id="基于nfs的解决方案实践">基于NFS的解决方案实践</h2>
+
+<p>为通过NFS技术实现HDFS到本地的挂载，进而完成映射，我们分两步走。</p>
+
+<p>一. 本地目录到本地目录的挂载</p>
+
+<p>首先需要安装nfs服务</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$sudo apt-get install nfs-kernel-server
+$sudo apt-get install nfs-client
+</code></pre>
+</div>
+
+<p>安装完成后，更新/etc/exports文件，并在最后添加如下一行：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>/ *(insecure, rw, async, no_root_squash)
+</code></pre>
+</div>
+
+<p>其中，“／”表示准备被挂载的目录， “＊”对应允许挂载的IP地址，这里表示所有。</p>
+
+<p>安装完成后，启动nfs服务：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$sudo /etc/init.d/rpcbind start
+$sudo /etc/init.d/nfs-kernel-server start
+</code></pre>
+</div>
+
+<p>最后，实现挂载。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$sudo mount 192.168.0.123:/input /mnt
+</code></pre>
+</div>
+
+<p>二. HDFS到本地目录的挂载</p>
+
+<p>这一部分是实际操作中bug频出的地方，归根结底是配置文件的错误。对core-site.xml和hdfs-site.xml两大文件，分别添加如下内容：</p>
+
+<p>– core-site.xml</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;property&gt;
+&lt;name&gt;hadoop.proxyuser.root.groups&lt;/name&gt;
+&lt;value&gt;*&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+&lt;name&gt;hadoop.proxyuser.root.hosts&lt;/name&gt;
+&lt;value&gt;192.168.0.123&lt;/value&gt;
+&lt;/property&gt;
+
+</code></pre>
+</div>
+
+<p>注意，这里<name>标签里的“root”，在很多教程里写成“nfsserver”或"hadoop"，在楼长的实际操作中，只有“root”不报错。</name></p>
+
+<p>– hdfs-site.xml</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&lt;property&gt;
+&lt;name&gt;dfs.namenode.accesstime.precision&lt;/name&gt;
+&lt;value&gt;3600000&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+&lt;name&gt;nfs.dump.dir&lt;/name&gt;
+&lt;value&gt;/tmp/.hdfs-nfs&lt;/value&gt;
+&lt;/property&gt;
+
+&lt;property&gt;
+&lt;name&gt;nfs.exports.allowed.hosts&lt;/name&gt;
+&lt;value&gt;* rw&lt;/value&gt;
+&lt;/property&gt;
+
+</code></pre>
+</div>
+
+<p>配置文件更新后，同步到各节点，并启动集群。</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$sbin/start-all.sh
+</code></pre>
+</div>
+
+<p>使用以下命令启动hadoop中的nfs服务：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$sudo /etc/init.d/nfs-kernel-server stop
+$sudo /etc/init.d/rpcbind stop
+$sudo ./hadoop-daemon.sh start portmap
+$sudo ./hadoop-daemon.sh start nfs3
+</code></pre>
+</div>
+
+<p>查看是否成功：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$sudo rpcinfo -p 192.168.0.123
+$sudo showmount -e 192.168.0.123
+</code></pre>
+</div>
+
+<p>服务启起来之后，实现挂载：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$sudo mount -t nfs -o vers=3,proto=tcp,nolock,noacl 192.168.0.123:/ /mnt
+</code></pre>
+</div>
+
+<hr />
+
+
+
+                <hr style="visibility: hidden;">
+
+                
+
+
+                <ul class="pager">
+                    
+                    <li class="previous">
+                        <a href="/2017/03/16/hadoop-implementation/" data-toggle="tooltip" data-placement="top" title="「51CTO」Hadoop平台与开发环境搭建">
+                        Previous<br>
+                        <span>「51CTO」Hadoop平台与开发环境搭建</span>
+                        </a>
+                    </li>
+                    
+                    
+                    <li class="next">
+                        <a href="/2017/03/24/hadoop-fsimage/" data-toggle="tooltip" data-placement="top" title="查看HDFS文件物理存储路径的一两点思路">
+                        Next<br>
+                        <span>查看HDFS文件物理存储路径的一两点思路</span>
+                        </a>
+                    </li>
+                    
+                </ul>
+
+
+                
+
+                
+                <!-- disqus 评论框 start -->
+                <div class="comment">
+                    <div id="disqus_thread" class="disqus-thread"></div>
+                </div>
+                <!-- disqus 评论框 end -->
+                
+
+            </div>  
+
+    <!-- Side Catalog Container -->
+        
+            <div class="
+                col-lg-2 col-lg-offset-0
+                visible-lg-block
+                sidebar-container
+                catalog-container">
+                <div class="side-catalog">
+                    <hr class="hidden-sm hidden-xs">
+                    <h5>
+                        <a class="catalog-toggle" href="#">CATALOG</a>
+                    </h5>
+                    <ul class="catalog-body"></ul>
+                </div>
+            </div>
         
 
-<!-- USE SIDEBAR -->
-    <!-- PostList Container -->
-    		<div class="
-                col-lg-8 col-lg-offset-1
-                col-md-8 col-md-offset-1
-                col-sm-12
-                col-xs-12
-                postlist-container
-            ">
-    			<!-- Language Selector -->
-<select class="sel-lang" onchange= "onLanChange(this.options[this.options.selectedIndex].value)">
-    <option value="0" selected> 中文 Chinese </option>
-    <option value="1"> 英文 English </option>
-</select>
+    <!-- Sidebar Container -->
+            <div class="
+                col-lg-8 col-lg-offset-2
+                col-md-10 col-md-offset-1
+                sidebar-container">
 
-<!-- Chinese Version -->
-<div class="zh post-container">
+                <!-- Featured Tags -->
+                
+                <section>
+                    <hr class="hidden-sm hidden-xs">
+                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
+                    <div class="tags">
+        				
+                            
+        				
+                            
+        				
+                            
+                				<a href="/tags/#Big Data" title="Big Data" rel="3">
+                                    Big Data
+                                </a>
+                            
+        				
+                            
+                				<a href="/tags/#Hadoop" title="Hadoop" rel="3">
+                                    Hadoop
+                                </a>
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+                            
+        				
+        			</div>
+                </section>
+                
 
-    <!--copied from markdown -->
-    <blockquote><p>Stay foolish, Stay hungry.</p></blockquote>
-
-    <p>Hey，我是<strong>李昌龙</strong>，码农 &amp; 搬砖工，曾就读于<a href="http://www.ustc.edu.cn/">USTC</a>和<a href="http://www.ucla.edu/">UCLA</a>，博士。</p>
-
-    <p>一些作品和开源项目，请戳 <a href="http://github.com/liclong">Github</a>。</p>
-    
-    <p>音乐重度依赖患者，设计师强迫症患者，书买得比看得多患者，毒舌患者，科技产品发布会观看癖患者，间歇性感伤患者，习惯性熬夜患者。</p>
-    <!--
-    <h5>Talks</h5>
-
-    <ul>
-    <li><a href="//huangxuan.me/2016/11/20/sw-101-gdgdf/">Service Worker 101</a> · GDG DevFest 北京 2016</li>
-    <li><a href="//huangxuan.me/2016/10/20/pwa-qcon2016/">Progressive Web Apps 复兴序章</a> · <a href="http://2016.qconshanghai.com/presentation/3111">QCon 上海 2016</a></li>
-    <li><a href="//huangxuan.me/2016/06/05/pwa-in-my-pov/">Progressive Web App 之我见</a> · IO Redux 北京 2016</li>
-    <li><a href="//huangxuan.me/2015/12/28/css-sucks-2015/">CSS Still Sucks 2015</a> · 2015</li>
-    <li><a href="//huangxuan.me/2015/07/09/js-module-7day/">JavaScript 模块化七日谈</a> · 2015</li>
-    </ul>
-     -->
-</div>
-
-<!-- English Version -->
-<div class="en post-container">
-    <blockquote><p>Stay foolish, Stay hungry.</p></blockquote>
-
-    <p>Hi, I am <strong>Changlong Li (李昌龙)</strong>，you can call me <strong>Chris</strong>. I'm a PHD of USTC and UCLA. I am a designer who builds softwares on <a href="http://github.com/liclong">Github</a>.</p>
-
-<!--
-    <h5>Talks</h5>
-    <ul>
-    <li><a href="//huangxuan.me/2016/11/20/sw-101-gdgdf/" title="Service Worker 101 - working offline and instant loading">Service Worker 101</a> · GDG DevFest Beijing 2016</li>
-    <li><a href="//huangxuan.me/2016/10/20/pwa-qcon2016/" title="Progressive Web Apps - make web great again">Progressive Web Apps</a> · QCon Shanghai 2016</li>
-    <li><a href="//huangxuan.me/2016/06/05/pwa-in-my-pov/" title="Progressive Web App in my point of view">Progressive Web App in my POV</a> · IO Redux Beijing 2016</li>
-    <li><a href="//huangxuan.me/2015/12/28/css-sucks-2015/" title="CSS Still Sucks 2015 - and how we work around it">CSS Still Sucks 2015</a> · 2015</li>
-    <li><a href="//huangxuan.me/2015/07/09/js-module-7day/">JavaScript Modularization Journey</a> · 2015</li>
-    </ul>
--->
-</div>
-
-<!-- Handle Language Change -->
-<script type="text/javascript">
-    // get nodes
-    var $zh = document.querySelector(".zh");
-    var $en = document.querySelector(".en");
-    var $select = document.querySelector("select");
-
-    // bind hashchange event
-    window.addEventListener('hashchange', _render);
-
-    // handle render
-    function _render(){
-        var _hash = window.location.hash;
-        // en
-        if(_hash == "#en"){
-            $select.selectedIndex = 1;
-            $en.style.display = "block";
-            $zh.style.display = "none";
-        // zh by default
-        }else{
-            // not trigger onChange, otherwise cause a loop call.
-            $select.selectedIndex = 0;
-            $zh.style.display = "block";
-            $en.style.display = "none";
-        }
-    }
-
-    // handle select change
-    function onLanChange(index){
-        if(index == 0){
-            window.location.hash = "#zh"
-        }else{
-            window.location.hash = "#en"
-        }
-    }
-
-    // init
-    _render();
-</script>
-
-
-
-
-
-
-
-<!-- disqus 评论框 start -->
-<div class="comment">
-    <div id="disqus_thread" class="disqus-thread">
-
+                <!-- Friends Blog -->
+                <!--
+                
+                 -->
+            </div>
+        </div>
     </div>
-</div>
-<!-- disqus 评论框 end -->
+</article>
+
+
+
+
+
 
 <!-- disqus 公共JS代码 start (一个网页只需插入一次) -->
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "liclong";
-    var disqus_identifier = "liclong//about/";
-    var disqus_url = "http://localhost:4000/about/";
+    var disqus_identifier = "/2017/03/20/hadoop-dfs-nfs-lfs";
+    var disqus_url = "http://localhost:4000/2017/03/20/hadoop-dfs-nfs-lfs/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
@@ -296,126 +461,46 @@
 <!-- disqus 公共JS代码 end -->
 
 
-    		</div>
-    <!-- Sidebar Container -->
-            <div class="
-                col-lg-3 col-lg-offset-0
-                col-md-3 col-md-offset-0
-                col-sm-12
-                col-xs-12
-                sidebar-container
-            ">
-            
-                <!-- Featured Tags -->
-                <!--
-                
-                <section>
-                    <hr class="hidden-sm hidden-xs">
-                    <h5><a href="/tags/">FEATURED TAGS</a></h5>
-                    <div class="tags">
-                        
-                            
-                        
-                            
-                        
-                            
-                                <a href="/tags/#Big Data" title="Big Data" rel="3">
-                                    Big Data
-                                </a>
-                            
-                        
-                            
-                                <a href="/tags/#Hadoop" title="Hadoop" rel="3">
-                                    Hadoop
-                                </a>
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                            
-                        
-                    </div>
-                </section>
-                
-                 -->
 
-                <!-- Short About -->
-                <section class="visible-md visible-lg">
-                    <hr><h5><a href="/about/">ABOUT ME</a></h5>
-                    <div class="short-about">
-                        
-                            <img src="/img/weibo-id.png" />
-                        
-                        
-                            <p>Stay foolish, Stay hungry!<br>这里是楼长的博客，与你一起发现更远的世界。</p>
-                        
-                        <!-- SNS Link -->
-                        <ul class="list-inline">
-                            
-                            
-                            
-                            <li>
-                                <a target="_blank" href="http://weibo.com/来自COOP的楼长">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-weibo fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://www.facebook.com/100010765389727">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-facebook fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://github.com/liclong">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-github fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                            
-                            <li>
-                                <a target="_blank" href="https://www.linkedin.com/in/changlong-li-272a1bba">
-                                    <span class="fa-stack fa-lg">
-                                        <i class="fa fa-circle fa-stack-2x"></i>
-                                        <i class="fa fa-linkedin fa-stack-1x fa-inverse"></i>
-                                    </span>
-                                </a>
-                            </li>
-                            
-                        </ul>
-                    </div>
-                </section>
-                
-    		</div>
-        
-	</div>
-</div>
 
-<hr style="filter: alpha(opacity=100,finishopacity=0,style=3)" width="80%" color="#987cb9" size="3">
+<!-- async load function -->
+<script>
+    function async(u, c) {
+      var d = document, t = 'script',
+          o = d.createElement(t),
+          s = d.getElementsByTagName(t)[0];
+      o.src = u;
+      if (c) { o.addEventListener('load', function (e) { c(null, e); }, false); }
+      s.parentNode.insertBefore(o, s);
+    }
+</script>
+<!-- anchor-js, Doc:http://bryanbraun.github.io/anchorjs/ -->
+<script>
+    async("//cdnjs.cloudflare.com/ajax/libs/anchor-js/1.1.1/anchor.min.js",function(){
+        anchors.options = {
+          visible: 'always',
+          placement: 'right',
+          icon: '#'
+        };
+        anchors.add().remove('.intro-header h1').remove('.subheading').remove('.sidebar-container h5');
+    })
+</script>
+<style>
+    /* place left on bigger screen */
+    @media all and (min-width: 800px) {
+        .anchorjs-link{
+            position: absolute;
+            left: -0.75em;
+            font-size: 1.1em;
+            margin-top : -0.1em;
+        }
+    }
+</style>
+
+
 <div style="text-align:center;">
-    <span id="busuanzi_container_site_pv">
-        本站总访问量<span id="busuanzi_value_site_pv"></span>次
+    <span id="busuanzi_container_page_pv">
+        本文总阅读量<span id="busuanzi_value_page_pv"></span>次
     </span>
 </div>
 
@@ -563,6 +648,50 @@
 
 
 <!-- Side Catalog -->
+
+<script type="text/javascript">
+    function generateCatalog (selector) {
+        var P = $('div.post-container'),a,n,t,l,i,c;
+        a = P.find('h1,h2,h3,h4,h5,h6');
+        a.each(function () {
+            n = $(this).prop('tagName').toLowerCase();
+            i = "#"+$(this).prop('id');
+            t = $(this).text();
+            c = $('<a href="'+i+'" rel="nofollow">'+t+'</a>');
+            l = $('<li class="'+n+'_nav"></li>').append(c);
+            $(selector).append(l);
+        });
+        return true;    
+    }
+
+    generateCatalog(".catalog-body");
+
+    // toggle side catalog
+    $(".catalog-toggle").click((function(e){
+        e.preventDefault();
+        $('.side-catalog').toggleClass("fold")
+    }))
+
+    /*
+     * Doc: https://github.com/davist11/jQuery-One-Page-Nav
+     * Fork by Hux to support padding
+     */
+    async("/js/jquery.nav.js", function () {
+        $('.catalog-body').onePageNav({
+            currentClass: "active",
+            changeHash: !1,
+            easing: "swing",
+            filter: "",
+            scrollSpeed: 700,
+            scrollOffset: 0,
+            scrollThreshold: .2,
+            begin: null,
+            end: null,
+            scrollChange: null,
+            padding: 80
+        });
+    });
+</script>
 
 
 <!--显示访问量-->
