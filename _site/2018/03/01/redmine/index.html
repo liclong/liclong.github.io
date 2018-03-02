@@ -10,7 +10,7 @@
     <meta name="keywords"  content="Coop, 云计算, ChrisLi, 极客, @liclong, 楼长de博客, Chris‘ Blog, 互联网, 设计, 产品，USTC, UCLA, 智慧城市">
     <meta name="theme-color" content="#000000">
     
-    <title>Hey, 这是我的第一篇GitHub博客 - 来自COOP楼长的博客 | Chris' Blog</title>
+    <title>资源管理平台Redmine - 部署篇 - 来自COOP楼长的博客 | Chris' Blog</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -19,7 +19,7 @@
     <link rel="shortcut icon" href="/img/favicon.ico">
     
     <!-- Canonical URL -->
-    <link rel="canonical" href="http://localhost:4000/2017/03/10/the-first-blog/">
+    <link rel="canonical" href="http://localhost:4000/2018/03/01/redmine/">
 
     <!-- Bootstrap Core CSS -->
     <link rel="stylesheet" href="/css/bootstrap.min.css">
@@ -151,13 +151,13 @@
 
     <!-- Image to hack wechat -->
 <!-- <img src="/img/icon_wechat.png" width="0" height="0"> -->
-<!-- <img src="/img/home-bg.jpg" width="0" height="0"> -->
+<!-- <img src="/img/post-bg-alitrip.jpg" width="0" height="0"> -->
 
 <!-- Post Header -->
 <style type="text/css">
     header.intro-header{
         position: relative;
-        background-image: url('/img/home-bg.jpg')
+        background-image: url('/img/post-bg-alitrip.jpg')
     }
 
     
@@ -179,15 +179,15 @@
                         
                         <a class="tag" href="/tags/#Web开发" title="Web开发">Web开发</a>
                         
-                        <a class="tag" href="/tags/#写作" title="写作">写作</a>
+                        <a class="tag" href="/tags/#Redmine" title="Redmine">Redmine</a>
                         
                     </div>
-                    <h1>Hey, 这是我的第一篇GitHub博客</h1>
+                    <h1>资源管理平台Redmine - 部署篇</h1>
                     
                     
-                    <h2 class="subheading">If you can quit, then quit. If you cannot quit, your are a writer. - R.A.Salvatore</h2>
+                    <h2 class="subheading">The palest ink is better than the best memory!</h2>
                     
-                    <span class="meta">Posted by Chris on March 10, 2017</span>
+                    <span class="meta">Posted by Chris on March 1, 2018</span>
                 </div>
             </div>
         </div>
@@ -205,214 +205,513 @@
                 col-md-10 col-md-offset-1
                 post-container">
 
-				<h2 id="为什么写博客">为什么写博客</h2>
-
-<p>关于“为什么写博客”，这其实是和“博客”同样古老的话题，一百个人能给出一千个理由来。这里楼长仅仅抛砖引玉陈列一些个人教训，希望走过类似弯路的童鞋有所共鸣。同时推荐大家参考和菜头的《<a href="http://www.jianshu.com/p/25de264a79cb">开始写作吧</a>》，刘未鹏的《<a href="https://www.douban.com/note/530583920/">为什么你应该（从现在开始就）写博客</a>》，李笑来的《<a href="http://garrolan.blogspot.com/2017/03/app33.html">为什么你一定要学会写作</a>》，以及 Joshua Becker 的《<a href="http://www.becomingminimalist.com/15-reasons-i-think-you-should-blog/">Why you should write blog</a>》。</p>
-
-<p><b>一、好记性不如烂笔头</b></p>
-
-<p>时间是我们的朋友，也是我们的敌人。如果能善加利用，可以随着时间积累很多知识，但如果利用不当，不但得不到认知升级，原有的技术储备也很有可能会慢慢流失。</p>
-
-<p>之前在学校零零星星参与过一些项目，但遗憾的是，随着时间的推移，稍早之前做的工作很大一部分都记不清细节了。这导致了一个严重后果：再上类似项目，需要大量的返工和重新查阅资料。每每到此，我都投心疾首，悔当初一时偷懒没把当时的东西整理记录。</p>
-
-<p>举个例子，之前在 <a href="http://metro.cs.ucla.edu/mobile_insight/">MobileInsight</a> 项目中第一次接触 git，主要用于团队成员间代码的同步和版本控制，所以当时对 git 命令还算比较熟悉，但之后相当长一段时间就再没用过。最近毕业在即，打算将以前的项目整理出来放到 GitHub，这才发现很多 git 命令已经记不清了，只得找出《GitHub 入门与实践》翻查命令。</p>
-
-<p><b>二、Open Source 的魅力</b></p>
-
-<blockquote>
-  <p>“通过分享，你获得了直接而快速的回报，你最终或许会发现你已将版权和“保留所有权利”抛诸脑后。新的经济学准则是：参与你作品的人越多，回报越高。在分享主义里，如果你愿意你可以保留所有权，但是我乐于分享。” by 毛向辉 《分享主义：一场思维革命》</p>
+				<blockquote>
+  <p>元宵节了，楼长这里先祝大家新的一年团团圆圆！</p>
 </blockquote>
 
-<p>相信很多人和楼长一样，第一次接触博客是从读某一篇技术帖开始的，而那篇帖子也因为帮自己解决了某个 Bug 或 Error 而挽救了当时即将崩溃的内心。也正是多次这样的经历，强化了我对技术博客的由衷好感以及诸多大牛博主的感激之情。当然，除了大量国内分享的技术博客，还有大量国外分享的代码，这些共同构成了现今的互联网精神 —— 开源！</p>
+<p>楼长搭建资源管理平台的最初动机在于实验室管理的需要，希望通过这样一个平台，促进团队协作、知识积累、新旧成员的能力继承。</p>
 
-<p>我们设想一个场景，一个办公室里有四个人，在你们共同构建的知识体系中你占40% 的比重，而其他三位各20%（好吧说人话：你比其他三位更牛一些）。如果一直保持互不交流的态势，你一直会是这个办公室里的佼佼者。However，如果另外三位仁兄互相学到对方的技能了呢？这是，你会惊喜地发现，架构体系发生了变化：60%，60%，60%，40%。也就是：27.3%，27.3%，27.3%，18.1%。</p>
+<p>这里平台采用的是阿里云租用的服务器，为期三年，具体网址这里就不公布了，上个效果图先～</p>
 
-<p>再进一步，如果你跳槽去了另一个办公室，你会更加惊喜地发现，自己连18.1%也算不上了，因为你的同事们已经在他们以前各自的办公室里完成了更高质量的知识迭代。</p>
+<p><img src="/img/2018-03-01-redmine/frontpage.png" alt="" /></p>
 
-<p>所以，一定要保持交流协作的意识，而不是抱着零和博弈的心态固步自封。无数前辈告诉我们一个道理：如果你认为自己是个大牛，一定是因为还没见识过真的大牛。</p>
+<p><b>一. 安装依赖软件</b></p>
 
-<p><b>三、总有那么些事让你专注</b></p>
+<p>注意，本平台部署于Ubuntu-16.04系统之上，所有操作请在root权限下操作。</p>
 
-<p>生活中，总有那么些事让你兴趣昂扬且乐此不疲，比如DOTA。生活大爆炸第七季第六集中有这样一个场景，Penny过来要求点菜，Sheldon沉迷研究，说”Can’t talk, in the zone”。这种对一件事的专注也就是所谓的心流体验。对心流理论感兴趣的同学可以请教度娘或直接了解 <a href="https://en.wikipedia.org/wiki/Mihaly_Csikszentmihalyi">Mihaly Csikszentmihalyi</a> 教授。</p>
-
-<p>问题来了，我们的时间都是有限的，不被这件事填充就被那件事占满，如果能把专注的对象放在对自己有提升的事情上，比如写作，难道不是两全其美吗？</p>
-
-<p>此外，坚持写作能成为自己持续学习的动力。为了完成一篇文章，首先需要获取第一手资料，寻找信息来源、将调研的“信息”转化为“情报”并最终为自己所用，这本身就是一个知识积累和自身提升的过程。同时，你慢慢就学会了鉴别知识：哪些是行业关注的焦点，哪些技术在三到五年内还只能是概念股。在这个过程中，你会慢慢重塑自己的思维习惯并开始学会专注。</p>
-
-<p><b>四、思维的良好训练</b></p>
-
-<p>无论语言还是文字，都是一个人大脑运转的外在表现，是思维逻辑的真实写照。语言自不必说，你身边一定有那么些人，说话滔滔不绝，却总 get 不到点；另一些人，讲话条理清晰，严谨之余不失幽默，让人听来如沐春风。单就文字而论，这种情况也是完全适用的，而要提升这方面的能力，就要经过后天系统性的训练。</p>
-
-<p>很多时候你以为懂了，可当自己打算写下来的时候，就会发现无从下手了。如果一件事情你不能讲清楚，十有八九你还没有完全理解。将事情写下来，慢慢就可以提高你的逻辑思维能力，分析能力，写会迫使你在你脑中搭建一个有条理的框架。</p>
-
-<p>就像楼长写这篇文章一样，就要将值得写博客的原因一一罗列出并逐段打磨，只有这样内容才会更加清晰，而自己也可以更好的思考。</p>
-
-<p>当你自己完成一篇博客（文章），再回头看别人的博客（文章）时，那种感觉是不一样的。作者为什么这么构思？如果我来写该怎么写？相信我，你距离作者文字背后的思维会更近一步。</p>
-
-<p><b>五、探索全新的领域</b></p>
-
-<p>世界不止是你的家，你的公司，你的朋友圈，你应该去发现一个更大更远的世界。通过写博客，你会知道世界上还有很多人像你一样在写博客，这些人和知识正在世界的某个角落等着你。</p>
-
-<p>在写这篇文章的过程中，我才知道“多说”将在6月1日关闭；也才知道阿里有个叫鬼栈的前端开发工程师，后来去了饿了么；我才要将阳志平的博客重读一遍。写的过程会让你有很多新的发现，这些新的发现都值得你去再写下来，总结分享出去。</p>
-
-<p><b>六、赠人玫瑰，手有余香</b></p>
-
-<p>隔一段时间，再回头看自己写的博客，你会发现自己正在通过这样的方式在不断的成长，这种成长在自己眼里是一种财富，在别人眼里是一张地图，你得到了收获，不断修正自己的错误，别人得到指引，避免了弯路。</p>
-
-<h2 id="如何使用github搭建博客">如何使用GitHub搭建博客</h2>
-<p>闲话少说，这里我将适用 GitHub 搭建博客的方法记录如下。</p>
-
-<p><b>一、学习使用GitHub</b></p>
-
-<p>首先进入GitHub并申请账号，Google输入github，点击第一条进入，如下图。</p>
-
-<p><img src="/img/2017-03-11-the-first-blog/google-github.png" alt="" /></p>
-
-<p>想了解GitHub的童鞋可参见知乎：<a href="https://www.zhihu.com/question/19968479/">https://www.zhihu.com/question/19968479/</a>。</p>
-
-<p>进入GitHub主页后请首先注册账号。并创建一个 Repositories，命名为”<em>username</em>.github.io”。注意，这里，<em>username</em> 是你刚才注册的 GitHub 账号名，我的账号名是 <b><em>liclong</em></b>，因此这里填: “<b><em>liclong</em></b>.github.io”。</p>
-
-<p><img src="/img/2017-03-11-the-first-blog/github-repositories.png" alt="" /></p>
-
-<p><b>二、建立本地与GitHub的连接</b></p>
-
-<p><b>1. 本地电脑安装 git</b></p>
-
-<p>接下来我们在本地环境中实际安装 git，并进行各种设置。如果使用 Mac 可以忽略安装过程，因为系统已默认集成了这一功能，使用 Ubuntu 和 Windows 的童鞋可以参考：<a href="https://git-scm.com/book/en/v2/Getting-Started-Installing-Git">《Getting Started - Installing Git》</a>。</p>
-
-<p>下面我们对本地计算机里安装的 git 进行设置，首先设置的是使用 Git 时的姓名和邮箱地址。</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>$ git config --global user.name "firstname lastname"
-$ git config --global user.email "youemail@gmail.com"
+<pre><code class="language-jason">$ sudo su root
+$ apt update
+$ apt upgrade
+$ apt install mysql-server mysql-client libmysqlclient-dev imagemagick libmagickwand-dev libcurl4-openssl-dev git-core subversion build-essential
 </code></pre>
-</div>
-<p>设置完毕后可通过 ~/.gitconfig 文件进行更改。这里设置的姓名和邮箱地址会用在 Git 的提交日志。由于在 GitHub 上公开仓库后，这里的姓名和邮箱地址也会被一并公开，所以注意不要使用不便公开的隐私信息。</p>
 
-<p>此外，在 GitHub 上公开博客或源码后，前来参考的程序员可能来自世界任何地方，所以不要使用汉字，很多外国友人的中文水平远不如我们的英文水平。当然，如果不想使用真名，完全可以使用网络上的昵称。</p>
+<p>安装过程中需要设置Mysql的root用户密码：</p>
 
-<p><b>2. 本地创建密钥</b></p>
+<p><img src="/img/2018-03-01-redmine/mysql.png" alt="" /></p>
 
-<p>GitHub上连接已有仓库时的认证，是通过使用 SSH 的公开密钥认证方式进行的。现在我们来创建公开密钥认证所需的 SSH Key，并将其添加至GitHub。如果已经创建过，可以使用现有的密钥进行设置。</p>
+<p><b>二. 安装Redmine</b></p>
 
-<p>运行下面的命令创建 SSH Key。</p>
+<p>下载Redmine源码:</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ ssh-keygen -t rsa -C "youremail@gmail.com"
+<div class="highlighter-rouge"><pre class="highlight"><code>$ mkdir -p /var/www/
+$ cd /var/www/
+$ svn co https://svn.redmine.org/redmine/branches/3.2-stable redmine
 </code></pre>
 </div>
 
-<p>这里，“<em>youremail</em>@gmail.com” 部分改成你在创建GitHub账号时用的邮箱地址。最终，系统会在 Home 目录的一个隐藏文件夹 .ssh 下生成公钥 id_rsa.pub 和私钥 id_rsa。</p>
+<p>创建配置文件:</p>
 
-<p><b>3. 添加公钥到 GitHub</b></p>
-
-<p>在GitHub上添加公钥，今后就可以用私钥进行认证了。</p>
-
-<p>点击右上角的账户设定按钮（Account Settings），选择 SSH and GPG Keys 菜单，就会出现如下界面。点击 Add SSH Key，会出现 Title 和 Key 两个输入框。在 Title 中输入适当的密钥名称，Key 部分粘贴 id_rsa.pub 文件里的内容。</p>
-
-<p><img src="/img/2017-03-11-the-first-blog/github-sshkey.png" alt="" /></p>
-
-<p>如此一来，本地电脑和远端的 GitHub 服务器就建立了可信的连接。以后可以通过 git 命令快捷的从 GitHub 克隆项目，并将修改后的项目更新到 GitHub。</p>
-
-<p><b>三、先走一遍流程</b></p>
-
-<p>要了解一个项目，最快捷的方法就是先从头到尾过一遍。所以，我们首先创建一个最简单的网页，介绍从创建 GitHub 到访问网页到整个流程，以帮助大家理解。打开终端输入如下命令：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>$ git clone https://github.com/liclong/liclong.github.io
+<div class="highlighter-rouge"><pre class="highlight"><code>$ cd redmine
+$ cp config/configuration.yml.example config/configuration.yml
+$ cp config/database.yml.example config/database.yml
 </code></pre>
 </div>
 
-<p>这样可以将刚才在 GitHub 上创建的 Repositories 克隆到本地，你会发现在当前路径下多了一个文件夹：“liclong.github.io”。然后后续操作可以在本地进行，只需将最终版本再上传回 GitHub 即可。我们在克隆到本地的 liclong.github.io 目录下新建一个文件：index.html，这是网站的入口。文件编辑如下：</p>
+<p>配置数据库连接信息：</p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code><span class="cp">&lt;!DOCTYPE html&gt;</span>
-
-<span class="nt">&lt;html&gt;</span>
-
-<span class="nt">&lt;head&gt;</span>
-<span class="nt">&lt;title&gt;</span>liclong.github.io<span class="nt">&lt;/title&gt;</span>
-<span class="nt">&lt;/head&gt;</span>
-
-<span class="nt">&lt;body&gt;</span>
-<span class="nt">&lt;p&gt;&lt;a</span> <span class="na">href=</span><span class="s">"http://www.google.com"</span><span class="nt">&gt;</span>Link to another page<span class="nt">&lt;/a&gt;</span>.<span class="nt">&lt;/p&gt;</span>
-<span class="nt">&lt;/body&gt;</span>
-
-<span class="nt">&lt;/html&gt;</span>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ vim config/database.yml
 </code></pre>
 </div>
 
-<p>随后，将修改的文件同步回 GitHub。现在我们看一下如何将修改的东西同步回去。</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>$ git status                //查看仓库中文件修改状况
-$ git add index.html        //将文件加入暂存区
-$ git commit -m "the content of update"
-$ git push                  //现在，GitHub 上的仓库被更新了
+<div class="highlighter-rouge"><pre class="highlight"><code>production:
+adapter: mysql2
+database: redmine
+host: localhost
+username: redmine
+password: "test1234"
+encoding: utf8
 </code></pre>
 </div>
 
-<p>打开你的浏览器，输入你刚建的 Repository 的文件名，例如我的是 liclong.github.io。如下图所示，You get it!</p>
+<p>更改目录权限:</p>
 
-<p><img src="/img/2017-03-11-the-first-blog/github-link.png" alt="" /></p>
-
-<p>说白了，GitHub 提供了这样一种页面解析功能，你既可以拿它制作博客，也可以拿它做个人主页，功能就在那里，用途任你选择。详情可参考 <a href="https://pages.github.com/">GitHub Pages</a> 官方主页。</p>
-
-<p><b>四、使用Jekyll进行本地调试</b></p>
-
-<p>有一个问题，每次微调后都要同步回 GitHub 查看页面修改结果？ NO！</p>
-
-<p>理想的方式应该是，本地进行调试和预览，只把最终的版本上传至 GitHub 供大家浏览。幸运的是，Jekyll 提供这样的功能。</p>
-
-<p>打开 terminal, 安装 Ruby （Mac上已经预装了Ruby）。可以输入 $ ruby –version 去验证是否安装。</p>
-
-<p>接下来，输入sudo gem install github-pages，安装 Jekyll (gem update github-pages命令可以用来更新 Jekyll，以免 Github 服务器更新导致网站本地和线上表现不同)</p>
-
-<p>之后你需要在 master 下新建一个 file，命名为 Gemfile，输入</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>source 'https://rubygems.org'
-gem 'github-pages'
+<div class="highlighter-rouge"><pre class="highlight"><code>$ mkdir -p tmp tmp/pdf public/plugin_assets
+$ chown -R www-data:www-data files log tmp public/plugin_assets
+$ chmod -R 775 files log tmp public/plugin_assets
 </code></pre>
 </div>
 
-<p>运行 terminal，使用命令行移至 repository 根目录下（也就是刚才从 GitHub 上克隆下来的 liclong.github.io 目录）。之后运行</p>
+<p><b>三. 安装Ruby</b></p>
 
-<div class="highlighter-rouge"><pre class="highlight"><code>$ bundle exec jekyll serve
+<p>RVM是Ruby enVironment Manager的简写，是一个非常好ruby版本管理和安装工具。</p>
+
+<p>导入RVM公共密钥：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ curl -sSL https://rvm.io/mpapis.asc | sudo gpg2 --import -
 </code></pre>
 </div>
 
-<p>注意，如果没有前面创建的 Gemfile 文件，这个命令是执行不通过的。</p>
+<p>注意，系统可能提示找不到gpg2命令，不要慌，只需要按系统提示apt install安装相关依赖就好。</p>
 
-<p>下面，就可以使用 Jekyll 啦，本地测试在浏览器输入 http://localhost:4000 即可。</p>
+<p>接下来下载RVM的安装脚本并执行：</p>
 
-<p><b>五、学会使用Jekyll个性化博客</b></p>
-
-<p>从零写一个漂亮的博客时间成本太高。更何况，每写一篇博客还要重复大量以往的工作，既耗时又耗力。为美化博客且最大限度的实现代码复用，我们充分发挥拿来主义精神，它山之石可以攻玉。</p>
-
-<p>浏览器中登录 GitHub 网站，进入自己的 liclong.github.io 仓库（再次强调，<em>liclong</em>是我的用户名，大家在实际操作是将它改成自己的用户名）。</p>
-
-<p>随后，进入 liclong.github.io 仓库，并点击菜单栏中的 Settings。</p>
-
-<p><img src="/img/2017-03-11-the-first-blog/github-theme.png" alt="" /></p>
-
-<p>在 theme 中，选择你喜欢的主题。这里我们以 slate 主题为例，如下图所示。</p>
-
-<p><img src="/img/2017-03-11-the-first-blog/github-slate.png" alt="" /></p>
-
-<p>可以查看它在 GitHub 中的代码，并 git clone 到本地。现在将里面的代码全部复制到本地的 liclong.git.io 目录，文件名重复的直接 replace。然后，进入 liclong.github.io 目录，并执行：</p>
-
-<div class="highlighter-rouge"><pre class="highlight"><code>$ git status        //查看哪些文件做过修改
-$ git add .         //多个文件修改时，可以直接用.的方式实现全选
-$ git commit -m "this is an update"
-$ git push          //推送到 GitHub
+<div class="highlighter-rouge"><pre class="highlight"><code>$ curl -sSL https://get.rvm.io | bash -s stable
 </code></pre>
 </div>
 
-<p>打开浏览器，登录 <a href="http://liclong.github.io">http://liclong.github.io</a>，你会看到 slate 主题的网页里。修改 index.html 文件即可进行修改。具体细节可实际摸索。</p>
+<p>设置RVM环境变量：</p>
 
-<p>注意，目前的 GitHub 进行了改版，以前各教程中提到的 theme 中的 “automatic page generator” 已经不在，大家不必纠结。</p>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ source /usr/local/rvm/scripts/rvm
+</code></pre>
+</div>
 
-<p><img src="/img/2017-03-11-the-first-blog/github-answer.png" alt="" /></p>
+<p>安装RVM依赖:</p>
 
-<h2 id="结语">结语</h2>
+<div class="highlighter-rouge"><pre class="highlight"><code>$ rvm requirements
+</code></pre>
+</div>
 
-<p>以上。
-楼长，04月于苏州。</p>
+<p>安装Ruby；列出可用的Ruby版本：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ rvm list known
+</code></pre>
+</div>
+
+<p>选择合适的版本进行安装，这里我们选用的是2.3.0，请主要版本间的依赖关系：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ rvm install 2.3.0
+</code></pre>
+</div>
+
+<p>设置Ruby默认使用的版本：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ rvm use 2.3.0 --default
+</code></pre>
+</div>
+
+<p>查看Ruby版本：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ ruby -v
+</code></pre>
+</div>
+
+<p><b>三. 为Redmine创建数据库</b></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>mysql -u root -p
+</code></pre>
+</div>
+
+<p>这是以root用户登录，密码就是上面安装时输入的那个。</p>
+
+<p>对数据库操作如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>CREATE DATABASE redmine CHARACTER SET utf8mb4;
+CREATE USER 'redmine'@'localhost' IDENTIFIED BY 'my_password';
+GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';
+</code></pre>
+</div>
+
+<p>如果mysql版本号在5.5.2以下，将utf8mb4改成utf8即可：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>CREATE DATABASE redmine CHARACTER SET utf8;
+CREATE USER 'redmine'@'localhost' IDENTIFIED BY 'my_password';
+GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';
+</code></pre>
+</div>
+
+<p>上面SQL语句创建了一个叫redmine的数据库和redmine用户(密码”my_password”)。</p>
+
+<p><b>四. 安装Nginx和Phusion Passenger</b></p>
+
+<p>安装Passenger：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ gem install passenger --no-ri --no-rdoc
+</code></pre>
+</div>
+
+<p>编译安装Nginx:</p>
+
+<p>(这一步很吃内存，内存空间至少2GB，推荐4GB或以上)</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>&gt; passenger-install-nginx-module
+
+Welcome to the Phusion Passenger Nginx module installer, v5.0.30.
+
+This installer will guide you through the entire installation process. It
+shouldn't take more than 5 minutes in total.
+
+Here's what you can expect from the installation process:
+
+1. This installer will compile and install Nginx with Passenger support.
+2. You'll learn how to configure Passenger in Nginx.
+3. You'll learn how to deploy a Ruby on Rails application.
+
+Don't worry if anything goes wrong. This installer will advise you on how to
+solve any problems.
+
+Press Enter to continue, or Ctrl-C to abort.  # 回车
+
+--------------------------------------------
+
+Which languages are you interested in?
+
+Use &lt;space&gt; to select.
+If the menu doesn't display correctly, press '!' # 选择Ruby和Python
+
+‣ ⬢  Ruby
+⬢  Python
+⬡  Node.js
+⬡  Meteor
+--------------------------------------------
+
+Checking for required software...
+
+* Checking for C compiler...
+Found: yes
+....
+--------------------------------------------
+
+Automatically download and install Nginx?
+
+Nginx doesn't support loadable modules such as some other web servers do,
+so in order to install Nginx with Passenger support, it must be recompiled.
+
+Do you want this installer to download, compile and install Nginx for you?
+
+1. Yes: download, compile and install Nginx for me. (recommended)
+The easiest way to get started. A stock Nginx 1.10.1 with Passenger
+support, but with no other additional third party modules, will be
+installed for you to a directory of your choice.
+
+2. No: I want to customize my Nginx installation. (for advanced users)
+Choose this if you want to compile Nginx with more third party modules
+besides Passenger, or if you need to pass additional options to Nginx's
+'configure' script. This installer will  1) ask you for the location of
+the Nginx source code,  2) run the 'configure' script according to your
+instructions, and  3) run 'make install'.
+
+Whichever you choose, if you already have an existing Nginx configuration file,
+then it will be preserved.
+
+Enter your choice (1 or 2) or press Ctrl-C to abort: 1  # 编译安装Nginx
+
+--------------------------------------------
+....
+Where do you want to install Nginx to?
+
+Please specify a prefix directory [/opt/nginx]: /opt/nginx  # 设置Nginx安装目录，默认的/opt/nginx就可以
+</code></pre>
+</div>
+
+<p><b>五. 配置Nginx</b></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ vim /opt/nginx/conf/nginx.conf
+</code></pre>
+</div>
+
+<p>这一步是很容易出错的，文件内容如下：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid    logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    passenger_root /var/lib/gems/2.3.0/gems/passenger-5.1.12; 
+    passenger_ruby /usr/bin/ruby2.3;
+    #这两个路径自动生成，可能会不一样，只要检查确认路径下确实有这个东西就行
+
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  192.168.0.124; #所部署设备的IP地址
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        root /var/www/redmine/public;
+
+        passenger_enabled on;
+        client_max_body_size 10m;
+        #server_name http://192.168.0.124;
+        index index.html index.htm index.nginx-debian.html;
+
+        #location / {
+        #    root   html;
+        #    index  index.html index.htm;
+        #}
+
+        #error_page  404    /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+        root   html;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+
+
+</code></pre>
+</div>
+
+<p>测试Nginx配置：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ /opt/nginx/sbin/nginx -t
+</code></pre>
+</div>
+
+<p>把Nginx配置为Systemd服务：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>vim /lib/systemd/system/nginx.service
+</code></pre>
+</div>
+
+<p>写入内容：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/opt/nginx/logs/nginx.pid
+ExecStartPre=/opt/nginx/sbin/nginx -t
+ExecStart=/opt/nginx/sbin/nginx
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+</code></pre>
+</div>
+
+<p>启动Nginx服务：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>systemctl daemon-reload
+systemctl start nginx
+</code></pre>
+</div>
+
+<p><b>六. 后续操作</b></p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>gem install bundler
+bundle install --without development test
+</code></pre>
+</div>
+
+<p>生成tocken和数据表：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>bundle exec rake generate_secret_token
+RAILS_ENV=production bundle exec rake db:migrate
+RAILS_ENV=production bundle exec rake redmine:load_default_data
+</code></pre>
+</div>
+<p>这里，语言选择默认的[en]就好，不选[zh]同样支持中文。</p>
+
+<p>最后，重启Nginx：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>systemctl restart nginx
+</code></pre>
+</div>
+
+<p>直接访问地址192.168.0.124:80即可。</p>
+
+<p><b>七. 疑难问题</b></p>
+
+<p><b>1. 版本间的依赖关系</b></p>
+
+<p>很多莫名其妙的bug都是由于版本依赖引起的，官方给出的Redmine、Ruby、Rails的依赖关系如下：</p>
+
+<p><img src="/img/2018-03-01-redmine/version.png" alt="" /></p>
+
+<p>终端命令：rails/ruby/nginx/rvm -v，以及：mysql –version，可以查看版本号。</p>
+
+<p>楼长实际部署采用的版本为：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Redmine 3.2
+Rails 4.2.7.1
+ruby 2.3.0p0 (2015-12-25 revision 53290) [x86_64-linux]
+nginx version: nginx/1.10.3 (Ubuntu)
+rvm 1.29.3 (latest) by Michal Papis, Piotr Kuczynski, Wayne E. Seguin [https://rvm.io]
+mysql  Ver 14.14 Distrib 5.7.21, for Linux (x86_64) using  EditLine wrapper
+</code></pre>
+</div>
+
+<p><b>2. 出现500 Internal error错误</b></p>
+
+<p>登陆后，进入个人页面或设置中，就会提示500 Internal error错误：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>Internal error
+An error occurred on the page you were trying to access.
+If you continue to experience problems please contact your Redmine administrator for assistance.
+If you are the Redmine administrator, check your log files for details about the error.
+</code></pre>
+</div>
+
+<p>但首页等地方，却没有问题，翻阅资料查出可能是language的问题</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>cd /var/www/redmine
+vim app/helpers/application_helper.rb
+</code></pre>
+</div>
+
+<p>定位到这段代码:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>def lang_options_for_select(blank=true)
+    (blank ? [["(auto)", ""]] : []) + languages_options
+end
+</code></pre>
+</div>
+
+<p>替换成:</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>def lang_options_for_select(blank=true)
+    (blank ? [["(auto)", ""]] : []) + valid_languages.collect{|lang| [ ll(lang.to_s, :general_lang_name), lang.to_s]}.sort{|x,y| x.last &lt;=&gt; y.last }
+end
+</code></pre>
+</div>
+
+<p>然后重启Nginx服务，问题解决。</p>
+
+<p><b>3. 对mysql的编码情况查看</b></p>
+
+<p><b>4. 平台可以使用了，唯独上传文件失败</b></p>
+
+<p>这是由于没有被赋予上传文件的权限，将/var/www/redmine/files目录权限改为777即可：</p>
+
+<div class="highlighter-rouge"><pre class="highlight"><code>$ chmod -R 777 /var/www/redmine/files
+</code></pre>
+</div>
+
+<p>这是上传文件的默认存储路径。</p>
+
+<blockquote>
+  <p>部署篇主要参考的文献如下：</p>
+</blockquote>
+
+<p>[1]. <a href="http://blog.topspeedsnail.com/archives/9131">http://blog.topspeedsnail.com/archives/9131</a><br />
+[2]. <a href="http://www.redmine.org/projects/redmine/wiki/RedmineInstall#Step-2-Create-an-empty-database-and-accompanying-user">http://www.redmine.org/projects/redmine/wiki/RedmineInstall#Step-2-Create-an-empty-database-and-accompanying-user</a><br />
+[3]. <a href="http://blog.csdn.net/u012410733/article/details/61619656">http://blog.csdn.net/u012410733/article/details/61619656</a><br />
+[4]. <a href="http://bbs.csdn.net/topics/391070843">http://bbs.csdn.net/topics/391070843</a></p>
 
 <hr />
 
@@ -425,13 +724,13 @@ $ git push          //推送到 GitHub
 
                 <ul class="pager">
                     
-                    
-                    <li class="next">
-                        <a href="/2017/03/16/hadoop-implementation/" data-toggle="tooltip" data-placement="top" title="「51CTO」Hadoop平台与开发环境搭建">
-                        Next<br>
-                        <span>「51CTO」Hadoop平台与开发环境搭建</span>
+                    <li class="previous">
+                        <a href="/2017/09/11/tensorflow-building-from-source/" data-toggle="tooltip" data-placement="top" title="Tensorflow学习笔记一 —— 从源码编译到部署安装">
+                        Previous<br>
+                        <span>Tensorflow学习笔记一 —— 从源码编译到部署安装</span>
                         </a>
                     </li>
+                    
                     
                 </ul>
 
@@ -536,8 +835,8 @@ $ git push          //推送到 GitHub
 <script type="text/javascript">
     /* * * CONFIGURATION VARIABLES * * */
     var disqus_shortname = "liclong";
-    var disqus_identifier = "/2017/03/10/the-first-blog";
-    var disqus_url = "http://localhost:4000/2017/03/10/the-first-blog/";
+    var disqus_identifier = "/2018/03/01/redmine";
+    var disqus_url = "http://localhost:4000/2018/03/01/redmine/";
 
     (function() {
         var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;

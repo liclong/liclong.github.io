@@ -1,0 +1,528 @@
+---
+layout:     post
+title:      "资源管理平台Redmine - 部署篇"
+subtitle:   "The palest ink is better than the best memory!"
+date:       2018-03-01 12:00:00
+author:     "Chris"
+header-img: "img/post-bg-alitrip.jpg"
+header-mask: 0.3
+catalog:    true
+tags:
+    - Web开发
+    - Redmine
+---
+
+>元宵节了，楼长这里先祝大家新的一年团团圆圆！
+
+楼长搭建资源管理平台的最初动机在于实验室管理的需要，希望通过这样一个平台，促进团队协作、知识积累、新旧成员的能力继承。
+
+这里平台采用的是阿里云租用的服务器，为期三年，具体网址这里就不公布了，上个效果图先～
+
+![](/img/2018-03-01-redmine/frontpage.png)
+
+<b>一. 安装依赖软件</b>
+
+注意，本平台部署于Ubuntu-16.04系统之上，所有操作请在root权限下操作。
+
+```jason
+$ sudo su root
+$ apt update
+$ apt upgrade
+$ apt install mysql-server mysql-client libmysqlclient-dev imagemagick libmagickwand-dev libcurl4-openssl-dev git-core subversion build-essential
+```
+
+安装过程中需要设置Mysql的root用户密码：
+
+![](/img/2018-03-01-redmine/mysql.png)
+
+<b>二. 安装Redmine</b>
+
+下载Redmine源码:
+
+```
+$ mkdir -p /var/www/
+$ cd /var/www/
+$ svn co https://svn.redmine.org/redmine/branches/3.2-stable redmine
+```
+
+创建配置文件:
+
+```
+$ cd redmine
+$ cp config/configuration.yml.example config/configuration.yml
+$ cp config/database.yml.example config/database.yml
+```
+
+配置数据库连接信息：
+
+```
+$ vim config/database.yml
+```
+
+```
+production:
+adapter: mysql2
+database: redmine
+host: localhost
+username: redmine
+password: "test1234"
+encoding: utf8
+```
+
+更改目录权限:
+
+```
+$ mkdir -p tmp tmp/pdf public/plugin_assets
+$ chown -R www-data:www-data files log tmp public/plugin_assets
+$ chmod -R 775 files log tmp public/plugin_assets
+```
+
+<b>三. 安装Ruby</b>
+
+RVM是Ruby enVironment Manager的简写，是一个非常好ruby版本管理和安装工具。
+
+导入RVM公共密钥：
+
+```
+$ curl -sSL https://rvm.io/mpapis.asc | sudo gpg2 --import -
+```
+
+注意，系统可能提示找不到gpg2命令，不要慌，只需要按系统提示apt install安装相关依赖就好。
+
+接下来下载RVM的安装脚本并执行：
+
+```
+$ curl -sSL https://get.rvm.io | bash -s stable
+```
+
+设置RVM环境变量：
+
+```
+$ source /usr/local/rvm/scripts/rvm
+```
+
+安装RVM依赖:
+
+```
+$ rvm requirements
+```
+
+安装Ruby；列出可用的Ruby版本：
+
+```
+$ rvm list known
+```
+
+选择合适的版本进行安装，这里我们选用的是2.3.0，请主要版本间的依赖关系：
+
+```
+$ rvm install 2.3.0
+```
+
+设置Ruby默认使用的版本：
+
+```
+$ rvm use 2.3.0 --default
+```
+
+查看Ruby版本：
+
+```
+$ ruby -v
+```
+
+<b>三. 为Redmine创建数据库</b>
+
+```
+mysql -u root -p
+```
+
+这是以root用户登录，密码就是上面安装时输入的那个。
+
+对数据库操作如下：
+
+```
+CREATE DATABASE redmine CHARACTER SET utf8mb4;
+CREATE USER 'redmine'@'localhost' IDENTIFIED BY 'my_password';
+GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';
+```
+
+如果mysql版本号在5.5.2以下，将utf8mb4改成utf8即可：
+
+```
+CREATE DATABASE redmine CHARACTER SET utf8;
+CREATE USER 'redmine'@'localhost' IDENTIFIED BY 'my_password';
+GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';
+```
+
+上面SQL语句创建了一个叫redmine的数据库和redmine用户(密码"my_password")。
+
+<b>四. 安装Nginx和Phusion Passenger</b>
+
+安装Passenger：
+
+```
+$ gem install passenger --no-ri --no-rdoc
+```
+
+编译安装Nginx: 
+
+(这一步很吃内存，内存空间至少2GB，推荐4GB或以上)
+
+```
+> passenger-install-nginx-module
+
+Welcome to the Phusion Passenger Nginx module installer, v5.0.30.
+
+This installer will guide you through the entire installation process. It
+shouldn't take more than 5 minutes in total.
+
+Here's what you can expect from the installation process:
+
+1. This installer will compile and install Nginx with Passenger support.
+2. You'll learn how to configure Passenger in Nginx.
+3. You'll learn how to deploy a Ruby on Rails application.
+
+Don't worry if anything goes wrong. This installer will advise you on how to
+solve any problems.
+
+Press Enter to continue, or Ctrl-C to abort.  # 回车
+
+--------------------------------------------
+
+Which languages are you interested in?
+
+Use <space> to select.
+If the menu doesn't display correctly, press '!' # 选择Ruby和Python
+
+‣ ⬢  Ruby
+⬢  Python
+⬡  Node.js
+⬡  Meteor
+--------------------------------------------
+
+Checking for required software...
+
+* Checking for C compiler...
+Found: yes
+....
+--------------------------------------------
+
+Automatically download and install Nginx?
+
+Nginx doesn't support loadable modules such as some other web servers do,
+so in order to install Nginx with Passenger support, it must be recompiled.
+
+Do you want this installer to download, compile and install Nginx for you?
+
+1. Yes: download, compile and install Nginx for me. (recommended)
+The easiest way to get started. A stock Nginx 1.10.1 with Passenger
+support, but with no other additional third party modules, will be
+installed for you to a directory of your choice.
+
+2. No: I want to customize my Nginx installation. (for advanced users)
+Choose this if you want to compile Nginx with more third party modules
+besides Passenger, or if you need to pass additional options to Nginx's
+'configure' script. This installer will  1) ask you for the location of
+the Nginx source code,  2) run the 'configure' script according to your
+instructions, and  3) run 'make install'.
+
+Whichever you choose, if you already have an existing Nginx configuration file,
+then it will be preserved.
+
+Enter your choice (1 or 2) or press Ctrl-C to abort: 1  # 编译安装Nginx
+
+--------------------------------------------
+....
+Where do you want to install Nginx to?
+
+Please specify a prefix directory [/opt/nginx]: /opt/nginx  # 设置Nginx安装目录，默认的/opt/nginx就可以
+```
+
+<b>五. 配置Nginx</b>
+
+```
+$ vim /opt/nginx/conf/nginx.conf
+```
+
+这一步是很容易出错的，文件内容如下：
+
+```
+#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid    logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    passenger_root /var/lib/gems/2.3.0/gems/passenger-5.1.12; 
+    passenger_ruby /usr/bin/ruby2.3;
+    #这两个路径自动生成，可能会不一样，只要检查确认路径下确实有这个东西就行
+
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] "$request" '
+    #                  '$status $body_bytes_sent "$http_referer" '
+    #                  '"$http_user_agent" "$http_x_forwarded_for"';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  192.168.0.124; #所部署设备的IP地址
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        root /var/www/redmine/public;
+
+        passenger_enabled on;
+        client_max_body_size 10m;
+        #server_name http://192.168.0.124;
+        index index.html index.htm index.nginx-debian.html;
+
+        #location / {
+        #    root   html;
+        #    index  index.html index.htm;
+        #}
+
+        #error_page  404    /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+        root   html;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+
+
+```
+
+测试Nginx配置：
+
+```
+$ /opt/nginx/sbin/nginx -t
+```
+
+把Nginx配置为Systemd服务：
+
+```
+vim /lib/systemd/system/nginx.service
+```
+
+写入内容：
+
+```
+[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/opt/nginx/logs/nginx.pid
+ExecStartPre=/opt/nginx/sbin/nginx -t
+ExecStart=/opt/nginx/sbin/nginx
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+```
+
+启动Nginx服务：
+
+```
+systemctl daemon-reload
+systemctl start nginx
+```
+
+<b>六. 后续操作</b>
+
+```
+gem install bundler
+bundle install --without development test
+```
+
+生成tocken和数据表：
+
+```
+bundle exec rake generate_secret_token
+RAILS_ENV=production bundle exec rake db:migrate
+RAILS_ENV=production bundle exec rake redmine:load_default_data
+```
+这里，语言选择默认的\[en\]就好，不选\[zh\]同样支持中文。
+
+最后，重启Nginx：
+
+```
+systemctl restart nginx
+```
+
+直接访问地址192.168.0.124:80即可。
+
+<b>七. 疑难问题</b>
+
+<b>1. 版本间的依赖关系</b>
+
+很多莫名其妙的bug都是由于版本依赖引起的，官方给出的Redmine、Ruby、Rails的依赖关系如下：
+
+![](/img/2018-03-01-redmine/version.png)
+
+终端命令：rails/ruby/nginx/rvm -v，以及：mysql --version，可以查看版本号。
+
+楼长实际部署采用的版本为：
+
+```
+Redmine 3.2
+Rails 4.2.7.1
+ruby 2.3.0p0 (2015-12-25 revision 53290) [x86_64-linux]
+nginx version: nginx/1.10.3 (Ubuntu)
+rvm 1.29.3 (latest) by Michal Papis, Piotr Kuczynski, Wayne E. Seguin [https://rvm.io]
+mysql  Ver 14.14 Distrib 5.7.21, for Linux (x86_64) using  EditLine wrapper
+```
+
+<b>2. 出现500 Internal error错误</b>
+
+登陆后，进入个人页面或设置中，就会提示500 Internal error错误：
+
+```
+Internal error
+An error occurred on the page you were trying to access.
+If you continue to experience problems please contact your Redmine administrator for assistance.
+If you are the Redmine administrator, check your log files for details about the error.
+```
+
+但首页等地方，却没有问题，翻阅资料查出可能是language的问题
+
+```
+cd /var/www/redmine
+vim app/helpers/application_helper.rb
+```
+
+定位到这段代码:
+
+```
+def lang_options_for_select(blank=true)
+    (blank ? [["(auto)", ""]] : []) + languages_options
+end
+```
+
+替换成:
+
+```
+def lang_options_for_select(blank=true)
+    (blank ? [["(auto)", ""]] : []) + valid_languages.collect{|lang| [ ll(lang.to_s, :general_lang_name), lang.to_s]}.sort{|x,y| x.last <=> y.last }
+end
+```
+
+然后重启Nginx服务，问题解决。
+
+<b>3. 对mysql的编码情况查看</b>
+
+<b>4. 平台可以使用了，唯独上传文件失败</b>
+
+这是由于没有被赋予上传文件的权限，将/var/www/redmine/files目录权限改为777即可：
+
+```
+$ chmod -R 777 /var/www/redmine/files
+```
+
+这是上传文件的默认存储路径。
+
+>部署篇主要参考的文献如下：
+
+\[1\]. [http://blog.topspeedsnail.com/archives/9131][1]\\
+\[2\]. [http://www.redmine.org/projects/redmine/wiki/RedmineInstall#Step-2-Create-an-empty-database-and-accompanying-user][2]\\
+\[3\]. [http://blog.csdn.net/u012410733/article/details/61619656][3]\\
+\[4\]. [http://bbs.csdn.net/topics/391070843][4]
+
+
+---
+
+[1]: http://blog.topspeedsnail.com/archives/9131
+[2]: http://www.redmine.org/projects/redmine/wiki/RedmineInstall#Step-2-Create-an-empty-database-and-accompanying-user
+[3]: http://blog.csdn.net/u012410733/article/details/61619656
+[4]: http://bbs.csdn.net/topics/391070843
+
+

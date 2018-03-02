@@ -5,9 +5,533 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Wed, 15 Nov 2017 23:50:55 -0800</pubDate>
-    <lastBuildDate>Wed, 15 Nov 2017 23:50:55 -0800</lastBuildDate>
+    <pubDate>Fri, 02 Mar 2018 07:05:45 -0800</pubDate>
+    <lastBuildDate>Fri, 02 Mar 2018 07:05:45 -0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
+    
+      <item>
+        <title>资源管理平台Redmine - 部署篇</title>
+        <description>&lt;blockquote&gt;
+  &lt;p&gt;元宵节了，楼长这里先祝大家新的一年团团圆圆！&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;楼长搭建资源管理平台的最初动机在于实验室管理的需要，希望通过这样一个平台，促进团队协作、知识积累、新旧成员的能力继承。&lt;/p&gt;
+
+&lt;p&gt;这里平台采用的是阿里云租用的服务器，为期三年，具体网址这里就不公布了，上个效果图先～&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2018-03-01-redmine/frontpage.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;一. 安装依赖软件&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;注意，本平台部署于Ubuntu-16.04系统之上，所有操作请在root权限下操作。&lt;/p&gt;
+
+&lt;pre&gt;&lt;code class=&quot;language-jason&quot;&gt;$ sudo su root
+$ apt update
+$ apt upgrade
+$ apt install mysql-server mysql-client libmysqlclient-dev imagemagick libmagickwand-dev libcurl4-openssl-dev git-core subversion build-essential
+&lt;/code&gt;&lt;/pre&gt;
+
+&lt;p&gt;安装过程中需要设置Mysql的root用户密码：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2018-03-01-redmine/mysql.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;二. 安装Redmine&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;下载Redmine源码:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ mkdir -p /var/www/
+$ cd /var/www/
+$ svn co https://svn.redmine.org/redmine/branches/3.2-stable redmine
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;创建配置文件:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ cd redmine
+$ cp config/configuration.yml.example config/configuration.yml
+$ cp config/database.yml.example config/database.yml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;配置数据库连接信息：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ vim config/database.yml
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;production:
+adapter: mysql2
+database: redmine
+host: localhost
+username: redmine
+password: &quot;test1234&quot;
+encoding: utf8
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;更改目录权限:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ mkdir -p tmp tmp/pdf public/plugin_assets
+$ chown -R www-data:www-data files log tmp public/plugin_assets
+$ chmod -R 775 files log tmp public/plugin_assets
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;b&gt;三. 安装Ruby&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;RVM是Ruby enVironment Manager的简写，是一个非常好ruby版本管理和安装工具。&lt;/p&gt;
+
+&lt;p&gt;导入RVM公共密钥：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ curl -sSL https://rvm.io/mpapis.asc | sudo gpg2 --import -
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;注意，系统可能提示找不到gpg2命令，不要慌，只需要按系统提示apt install安装相关依赖就好。&lt;/p&gt;
+
+&lt;p&gt;接下来下载RVM的安装脚本并执行：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ curl -sSL https://get.rvm.io | bash -s stable
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;设置RVM环境变量：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ source /usr/local/rvm/scripts/rvm
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;安装RVM依赖:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ rvm requirements
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;安装Ruby；列出可用的Ruby版本：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ rvm list known
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;选择合适的版本进行安装，这里我们选用的是2.3.0，请主要版本间的依赖关系：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ rvm install 2.3.0
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;设置Ruby默认使用的版本：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ rvm use 2.3.0 --default
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;查看Ruby版本：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ ruby -v
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;b&gt;三. 为Redmine创建数据库&lt;/b&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;mysql -u root -p
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这是以root用户登录，密码就是上面安装时输入的那个。&lt;/p&gt;
+
+&lt;p&gt;对数据库操作如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;CREATE DATABASE redmine CHARACTER SET utf8mb4;
+CREATE USER 'redmine'@'localhost' IDENTIFIED BY 'my_password';
+GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;如果mysql版本号在5.5.2以下，将utf8mb4改成utf8即可：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;CREATE DATABASE redmine CHARACTER SET utf8;
+CREATE USER 'redmine'@'localhost' IDENTIFIED BY 'my_password';
+GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;上面SQL语句创建了一个叫redmine的数据库和redmine用户(密码”my_password”)。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;四. 安装Nginx和Phusion Passenger&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;安装Passenger：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ gem install passenger --no-ri --no-rdoc
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;编译安装Nginx:&lt;/p&gt;
+
+&lt;p&gt;(这一步很吃内存，内存空间至少2GB，推荐4GB或以上)&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;&amp;gt; passenger-install-nginx-module
+
+Welcome to the Phusion Passenger Nginx module installer, v5.0.30.
+
+This installer will guide you through the entire installation process. It
+shouldn't take more than 5 minutes in total.
+
+Here's what you can expect from the installation process:
+
+1. This installer will compile and install Nginx with Passenger support.
+2. You'll learn how to configure Passenger in Nginx.
+3. You'll learn how to deploy a Ruby on Rails application.
+
+Don't worry if anything goes wrong. This installer will advise you on how to
+solve any problems.
+
+Press Enter to continue, or Ctrl-C to abort.  # 回车
+
+--------------------------------------------
+
+Which languages are you interested in?
+
+Use &amp;lt;space&amp;gt; to select.
+If the menu doesn't display correctly, press '!' # 选择Ruby和Python
+
+‣ ⬢  Ruby
+⬢  Python
+⬡  Node.js
+⬡  Meteor
+--------------------------------------------
+
+Checking for required software...
+
+* Checking for C compiler...
+Found: yes
+....
+--------------------------------------------
+
+Automatically download and install Nginx?
+
+Nginx doesn't support loadable modules such as some other web servers do,
+so in order to install Nginx with Passenger support, it must be recompiled.
+
+Do you want this installer to download, compile and install Nginx for you?
+
+1. Yes: download, compile and install Nginx for me. (recommended)
+The easiest way to get started. A stock Nginx 1.10.1 with Passenger
+support, but with no other additional third party modules, will be
+installed for you to a directory of your choice.
+
+2. No: I want to customize my Nginx installation. (for advanced users)
+Choose this if you want to compile Nginx with more third party modules
+besides Passenger, or if you need to pass additional options to Nginx's
+'configure' script. This installer will  1) ask you for the location of
+the Nginx source code,  2) run the 'configure' script according to your
+instructions, and  3) run 'make install'.
+
+Whichever you choose, if you already have an existing Nginx configuration file,
+then it will be preserved.
+
+Enter your choice (1 or 2) or press Ctrl-C to abort: 1  # 编译安装Nginx
+
+--------------------------------------------
+....
+Where do you want to install Nginx to?
+
+Please specify a prefix directory [/opt/nginx]: /opt/nginx  # 设置Nginx安装目录，默认的/opt/nginx就可以
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;b&gt;五. 配置Nginx&lt;/b&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ vim /opt/nginx/conf/nginx.conf
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这一步是很容易出错的，文件内容如下：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;#user  nobody;
+worker_processes  1;
+
+#error_log  logs/error.log;
+#error_log  logs/error.log  notice;
+#error_log  logs/error.log  info;
+
+#pid    logs/nginx.pid;
+
+
+events {
+    worker_connections  1024;
+}
+
+
+http {
+    passenger_root /var/lib/gems/2.3.0/gems/passenger-5.1.12; 
+    passenger_ruby /usr/bin/ruby2.3;
+    #这两个路径自动生成，可能会不一样，只要检查确认路径下确实有这个东西就行
+
+    include       mime.types;
+    default_type  application/octet-stream;
+
+    #log_format  main  '$remote_addr - $remote_user [$time_local] &quot;$request&quot; '
+    #                  '$status $body_bytes_sent &quot;$http_referer&quot; '
+    #                  '&quot;$http_user_agent&quot; &quot;$http_x_forwarded_for&quot;';
+
+    #access_log  logs/access.log  main;
+
+    sendfile        on;
+    #tcp_nopush     on;
+
+    #keepalive_timeout  0;
+    keepalive_timeout  65;
+
+    #gzip  on;
+
+    server {
+        listen       80;
+        server_name  192.168.0.124; #所部署设备的IP地址
+
+        #charset koi8-r;
+
+        #access_log  logs/host.access.log  main;
+
+        root /var/www/redmine/public;
+
+        passenger_enabled on;
+        client_max_body_size 10m;
+        #server_name http://192.168.0.124;
+        index index.html index.htm index.nginx-debian.html;
+
+        #location / {
+        #    root   html;
+        #    index  index.html index.htm;
+        #}
+
+        #error_page  404    /404.html;
+
+        # redirect server error pages to the static page /50x.html
+        #
+        error_page   500 502 503 504  /50x.html;
+        location = /50x.html {
+        root   html;
+        }
+
+        # proxy the PHP scripts to Apache listening on 127.0.0.1:80
+        #
+        #location ~ \.php$ {
+        #    proxy_pass   http://127.0.0.1;
+        #}
+
+        # pass the PHP scripts to FastCGI server listening on 127.0.0.1:9000
+        #
+        #location ~ \.php$ {
+        #    root           html;
+        #    fastcgi_pass   127.0.0.1:9000;
+        #    fastcgi_index  index.php;
+        #    fastcgi_param  SCRIPT_FILENAME  /scripts$fastcgi_script_name;
+        #    include        fastcgi_params;
+        #}
+
+        # deny access to .htaccess files, if Apache's document root
+        # concurs with nginx's one
+        #
+        #location ~ /\.ht {
+        #    deny  all;
+        #}
+    }
+
+    # another virtual host using mix of IP-, name-, and port-based configuration
+    #
+    #server {
+    #    listen       8000;
+    #    listen       somename:8080;
+    #    server_name  somename  alias  another.alias;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+
+    # HTTPS server
+    #
+    #server {
+    #    listen       443 ssl;
+    #    server_name  localhost;
+
+    #    ssl_certificate      cert.pem;
+    #    ssl_certificate_key  cert.key;
+
+    #    ssl_session_cache    shared:SSL:1m;
+    #    ssl_session_timeout  5m;
+
+    #    ssl_ciphers  HIGH:!aNULL:!MD5;
+    #    ssl_prefer_server_ciphers  on;
+
+    #    location / {
+    #        root   html;
+    #        index  index.html index.htm;
+    #    }
+    #}
+
+}
+
+
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;测试Nginx配置：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ /opt/nginx/sbin/nginx -t
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;把Nginx配置为Systemd服务：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;vim /lib/systemd/system/nginx.service
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;写入内容：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;[Unit]
+Description=The NGINX HTTP and reverse proxy server
+After=syslog.target network.target remote-fs.target nss-lookup.target
+
+[Service]
+Type=forking
+PIDFile=/opt/nginx/logs/nginx.pid
+ExecStartPre=/opt/nginx/sbin/nginx -t
+ExecStart=/opt/nginx/sbin/nginx
+ExecReload=/bin/kill -s HUP $MAINPID
+ExecStop=/bin/kill -s QUIT $MAINPID
+PrivateTmp=true
+
+[Install]
+WantedBy=multi-user.target
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;启动Nginx服务：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl daemon-reload
+systemctl start nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;b&gt;六. 后续操作&lt;/b&gt;&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;gem install bundler
+bundle install --without development test
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;生成tocken和数据表：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;bundle exec rake generate_secret_token
+RAILS_ENV=production bundle exec rake db:migrate
+RAILS_ENV=production bundle exec rake redmine:load_default_data
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+&lt;p&gt;这里，语言选择默认的[en]就好，不选[zh]同样支持中文。&lt;/p&gt;
+
+&lt;p&gt;最后，重启Nginx：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;systemctl restart nginx
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;直接访问地址192.168.0.124:80即可。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;七. 疑难问题&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;1. 版本间的依赖关系&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;很多莫名其妙的bug都是由于版本依赖引起的，官方给出的Redmine、Ruby、Rails的依赖关系如下：&lt;/p&gt;
+
+&lt;p&gt;&lt;img src=&quot;/img/2018-03-01-redmine/version.png&quot; alt=&quot;&quot; /&gt;&lt;/p&gt;
+
+&lt;p&gt;终端命令：rails/ruby/nginx/rvm -v，以及：mysql –version，可以查看版本号。&lt;/p&gt;
+
+&lt;p&gt;楼长实际部署采用的版本为：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Redmine 3.2
+Rails 4.2.7.1
+ruby 2.3.0p0 (2015-12-25 revision 53290) [x86_64-linux]
+nginx version: nginx/1.10.3 (Ubuntu)
+rvm 1.29.3 (latest) by Michal Papis, Piotr Kuczynski, Wayne E. Seguin [https://rvm.io]
+mysql  Ver 14.14 Distrib 5.7.21, for Linux (x86_64) using  EditLine wrapper
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;&lt;b&gt;2. 出现500 Internal error错误&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;登陆后，进入个人页面或设置中，就会提示500 Internal error错误：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;Internal error
+An error occurred on the page you were trying to access.
+If you continue to experience problems please contact your Redmine administrator for assistance.
+If you are the Redmine administrator, check your log files for details about the error.
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;但首页等地方，却没有问题，翻阅资料查出可能是language的问题&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;cd /var/www/redmine
+vim app/helpers/application_helper.rb
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;定位到这段代码:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def lang_options_for_select(blank=true)
+    (blank ? [[&quot;(auto)&quot;, &quot;&quot;]] : []) + languages_options
+end
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;替换成:&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;def lang_options_for_select(blank=true)
+    (blank ? [[&quot;(auto)&quot;, &quot;&quot;]] : []) + valid_languages.collect{|lang| [ ll(lang.to_s, :general_lang_name), lang.to_s]}.sort{|x,y| x.last &amp;lt;=&amp;gt; y.last }
+end
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;然后重启Nginx服务，问题解决。&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;3. 对mysql的编码情况查看&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;&lt;b&gt;4. 平台可以使用了，唯独上传文件失败&lt;/b&gt;&lt;/p&gt;
+
+&lt;p&gt;这是由于没有被赋予上传文件的权限，将/var/www/redmine/files目录权限改为777即可：&lt;/p&gt;
+
+&lt;div class=&quot;highlighter-rouge&quot;&gt;&lt;pre class=&quot;highlight&quot;&gt;&lt;code&gt;$ chmod -R 777 /var/www/redmine/files
+&lt;/code&gt;&lt;/pre&gt;
+&lt;/div&gt;
+
+&lt;p&gt;这是上传文件的默认存储路径。&lt;/p&gt;
+
+&lt;blockquote&gt;
+  &lt;p&gt;部署篇主要参考的文献如下：&lt;/p&gt;
+&lt;/blockquote&gt;
+
+&lt;p&gt;[1]. &lt;a href=&quot;http://blog.topspeedsnail.com/archives/9131&quot;&gt;http://blog.topspeedsnail.com/archives/9131&lt;/a&gt;&lt;br /&gt;
+[2]. &lt;a href=&quot;http://www.redmine.org/projects/redmine/wiki/RedmineInstall#Step-2-Create-an-empty-database-and-accompanying-user&quot;&gt;http://www.redmine.org/projects/redmine/wiki/RedmineInstall#Step-2-Create-an-empty-database-and-accompanying-user&lt;/a&gt;&lt;br /&gt;
+[3]. &lt;a href=&quot;http://blog.csdn.net/u012410733/article/details/61619656&quot;&gt;http://blog.csdn.net/u012410733/article/details/61619656&lt;/a&gt;&lt;br /&gt;
+[4]. &lt;a href=&quot;http://bbs.csdn.net/topics/391070843&quot;&gt;http://bbs.csdn.net/topics/391070843&lt;/a&gt;&lt;/p&gt;
+
+&lt;hr /&gt;
+
+</description>
+        <pubDate>Thu, 01 Mar 2018 04:00:00 -0800</pubDate>
+        <link>http://localhost:4000/2018/03/01/redmine/</link>
+        <guid isPermaLink="true">http://localhost:4000/2018/03/01/redmine/</guid>
+        
+        <category>Web开发</category>
+        
+        <category>Redmine</category>
+        
+        
+      </item>
     
       <item>
         <title>Tensorflow学习笔记一 —— 从源码编译到部署安装</title>
