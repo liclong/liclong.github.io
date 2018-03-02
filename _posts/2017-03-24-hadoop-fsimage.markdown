@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "查看HDFS文件物理存储路径的一两点思路"
+title:      "Hadoop进阶系列 - 查看HDFS文件物理存储路径的一两点思路"
 subtitle:   ""
 date:       2017-03-24 12:00:00
 author:     "Chris"

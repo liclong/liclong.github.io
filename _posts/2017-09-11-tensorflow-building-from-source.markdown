@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "Tensorflow学习笔记一 —— 从源码编译到部署安装"
+title:      "Tensorflow学习笔记 - 从源码编译到部署安装"
 subtitle:   ""
 date:       2017-09-11 12:00:00
 author:     "Chris"

@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "「51CTO」Hadoop平台与开发环境搭建"
+title:      "Hadoop进阶系列 -「51CTO」Hadoop平台与开发环境搭建"
 subtitle:   "An open source framework for distributed storage and parallel processing using MapReduce"
 date:       2017-03-16 12:00:00
 author:     "Chris"

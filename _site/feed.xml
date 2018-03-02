@@ -5,8 +5,8 @@
     <description>关于码农、搬砖工、Hacker与Runner | 这里是 @来自COOP楼长的个人博客，与你一起发现更远的世界。</description>
     <link>http://localhost:4000/</link>
     <atom:link href="http://localhost:4000/feed.xml" rel="self" type="application/rss+xml" />
-    <pubDate>Fri, 02 Mar 2018 07:05:45 -0800</pubDate>
-    <lastBuildDate>Fri, 02 Mar 2018 07:05:45 -0800</lastBuildDate>
+    <pubDate>Fri, 02 Mar 2018 07:15:47 -0800</pubDate>
+    <lastBuildDate>Fri, 02 Mar 2018 07:15:47 -0800</lastBuildDate>
     <generator>Jekyll v3.4.3</generator>
     
       <item>
@@ -534,7 +534,7 @@ end
       </item>
     
       <item>
-        <title>Tensorflow学习笔记一 —— 从源码编译到部署安装</title>
+        <title>Tensorflow学习笔记 - 从源码编译到部署安装</title>
         <description>&lt;blockquote&gt;
   &lt;p&gt;Key Words: Tensorflow, Bazel, CC&amp;amp;Python, Cuda&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -1295,7 +1295,7 @@ print np.__path__
       </item>
     
       <item>
-        <title>查看HDFS文件物理存储路径的一两点思路</title>
+        <title>Hadoop进阶系列 - 查看HDFS文件物理存储路径的一两点思路</title>
         <description>&lt;blockquote&gt;
   &lt;p&gt;Key Words: Hadoop, NFS, Distributed File System&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -1391,7 +1391,7 @@ $vim edits.xml
       </item>
     
       <item>
-        <title>如何实现分布式文件系统HDFS到本地Linux文件系统的映射</title>
+        <title>Hadoop进阶系列 - 如何实现分布式文件系统HDFS到本地Linux文件系统的映射</title>
         <description>&lt;blockquote&gt;
   &lt;p&gt;Key Words: Hadoop, NFS, Distributed File System&lt;/p&gt;
 &lt;/blockquote&gt;
@@ -1528,7 +1528,7 @@ $sudo showmount -e 192.168.0.123
       </item>
     
       <item>
-        <title>「51CTO」Hadoop平台与开发环境搭建</title>
+        <title>Hadoop进阶系列 -「51CTO」Hadoop平台与开发环境搭建</title>
         <description>&lt;blockquote&gt;
   &lt;p&gt;文章转自我在 51CTO 的一篇网络课程，如下是楼长 2014 年录的一段操作视频，供大家参考。&lt;/p&gt;
 &lt;/blockquote&gt;

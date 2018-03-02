@@ -1,6 +1,6 @@
 ---
 layout:     post
-title:      "如何实现分布式文件系统HDFS到本地Linux文件系统的映射"
+title:      "Hadoop进阶系列 - 如何实现分布式文件系统HDFS到本地Linux文件系统的映射"
 subtitle:   ""
 date:       2017-03-20 12:00:00
 author:     "Chris"
