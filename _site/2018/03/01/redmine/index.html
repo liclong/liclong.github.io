@@ -10,7 +10,7 @@
     <meta name="keywords"  content="Coop, 云计算, ChrisLi, 极客, @liclong, 楼长de博客, Chris‘ Blog, 互联网, 设计, 产品，USTC, UCLA, 智慧城市">
     <meta name="theme-color" content="#000000">
     
-    <title>资源管理平台Redmine - 部署篇 - 来自COOP楼长的博客 | Chris' Blog</title>
+    <title>资源共享平台Redmine使用和部署手册 - 来自COOP楼长的博客 | Chris' Blog</title>
 
     <!-- Web App Manifest -->
     <link rel="manifest" href="/pwa/manifest.json">
@@ -182,7 +182,7 @@
                         <a class="tag" href="/tags/#Redmine" title="Redmine">Redmine</a>
                         
                     </div>
-                    <h1>资源管理平台Redmine - 部署篇</h1>
+                    <h1>资源共享平台Redmine使用和部署手册</h1>
                     
                     
                     <h2 class="subheading">The palest ink is better than the best memory!</h2>
@@ -214,6 +214,100 @@
 <p>这里平台采用的是阿里云租用的服务器，为期三年，具体网址这里就不公布了，上个效果图先～</p>
 
 <p><img src="/img/2018-03-01-redmine/frontpage.png" alt="" /></p>
+
+<h2 id="入门篇">入门篇</h2>
+
+<p><b>一.功能菜单</b></p>
+
+<p>如下图所示，平台主菜单［1］在登录前包括五项内容，分别是：主页，项目，帮助，登录，注册。</p>
+
+<p>主页界面如［2］所示，它主要负责展示实验室信息；</p>
+
+<p>项目界面如［3］所示，平台的日常管理工作均在此界面下进行；</p>
+
+<p>帮助界面如［4］所示，官方提供了详细的说明文档；</p>
+
+<p>登录和注册界面如［5］和［6］所示，用户可在此登录或注册账号。</p>
+
+<p><img src="/img/2018-03-01-redmine/overview.png" alt="" /></p>
+
+<p><b>二.项目管理</b></p>
+
+<p>平台以项目的形式实现对资料的管理，用户登录后，点击页面左上角的“项目”按钮即可访问该账户权限范围内的所有项目。</p>
+
+<p>注意，不同用户所能看到的项目视图以及能够执行的操作是不同的。</p>
+
+<p><img src="/img/2018-03-01-redmine/project_page.png" alt="" /></p>
+
+<p>用户登录后，只需进入某个项目，即可基于该项目完成一系列操作，包括“记录活动”、“指派任务”、“发布新闻”、“文档共享”等。</p>
+
+<p><img src="/img/2018-03-01-redmine/project_view.png" alt="" /></p>
+
+<p>以上传文档为例，在平台项目中，［资料归档］－&gt;［学术成果］负责整理和分享实验室成员各学期所发表的学术论文和专利，用户在“文档”目录下可完成附件提交并添加描述。提交时请参考如下格式：</p>
+
+<p><img src="/img/2018-03-01-redmine/project_edit.png" alt="" /></p>
+
+<p>提交后，其他用户即可对该文件进行下载阅读。当然，其他用户不具有删除权限。</p>
+
+<p><img src="/img/2018-03-01-redmine/paper.png" alt="" /></p>
+
+<p>其它资料文件（如：工作周报、项目会议纪要等）均可通过上述方式共享。</p>
+
+<p><b>三.新闻发布</b></p>
+
+<p>用户可以对所负责项目发布新闻，该新闻可以被项目组内所有成员看到，新闻的编辑页面如下图所示。</p>
+
+<p><img src="/img/2018-03-01-redmine/news_edit.png" alt="" /></p>
+
+<p>用户可以在工作台查看最新发布的新闻。</p>
+
+<p><img src="/img/2018-03-01-redmine/news_view.png" alt="" /></p>
+
+<p><b>四.工作进度监管</b></p>
+
+<p>项目管理者可以发布任务，并对任务进行跟踪。通过［项目］－&gt;［新建问题］可以完成一次任务的发布，具体包括“任务内容”、“任务指派对象”、“开始日期”、“计划完成日期”、“跟踪者”等。被指派任务的用户在登录平台后即可在“我的工作台”看到。</p>
+
+<p>被指派的任务同样体现在日历和甘特图中。</p>
+
+<p><img src="/img/2018-03-01-redmine/rili.png" alt="" /></p>
+
+<p><img src="/img/2018-03-01-redmine/gantetu.png" alt="" /></p>
+
+<p><b>五.我的工作台</b></p>
+
+<p>［我的工作台］是在用户登录后才会出现的菜单项，在该界面中，用户可以编辑个人空间，添加或删除功能模块。</p>
+
+<h2 id="管理篇">管理篇</h2>
+
+<p>管理员在主菜单中，除了“主页”、“我的工作台”、“项目”外，额外会出现一个“管理”菜单，管理员可以在这里对平台进行管理。</p>
+
+<p><b>一.主页维护与主题设置</b></p>
+
+<p>对平台主页的维护和主题的选择可以通过管理界面中的“配置”进行管理，具体如下图所示：</p>
+
+<p><img src="/img/2018-03-01-redmine/config.png" alt="" /></p>
+
+<p><img src="/img/2018-03-01-redmine/config2.png" alt="" /></p>
+
+<p>注意，这里有Classic、Dwarf等多个主题，主题在后台位于“/var/www/redmine/public/themes”目录下，管理员可以根据需要在网上下载更多的主题。</p>
+
+<p>Redmine为用户提供了丰富的主题素材，大家可以自主的进行下载，并将下载后的主题（文件夹）通过scp命令拷贝到平台服务器的/var/www/redmine/public/themes目录下即可。</p>
+
+<p>主题下载地址：http://www.redminethemes.org/</p>
+
+<p>当然，也可以对主题中的背景色调进行微调，只需修改配置文件中“#58398e”等数据即可。</p>
+
+<p><img src="/img/2018-03-01-redmine/color.png" alt="" /></p>
+
+<p><b>二.用户权限控制</b></p>
+
+<p>管理员可以对用户赋予不同权限，如“管理人员”、“开发人员”、“报告人员”等，不同人员所具备的权限也完全可定制化。</p>
+
+<p>本平台对用户的“删除”权限进行了较严格的限定，一般情况下，用户仅可以上传资料，而对文档或项目的删除操作则是不被允许的。</p>
+
+<p><img src="/img/2018-03-01-redmine/private.png" alt="" /></p>
+
+<h2 id="部署篇">部署篇</h2>
 
 <p><b>一. 安装依赖软件</b></p>
 
@@ -325,7 +419,7 @@ $ chmod -R 775 files log tmp public/plugin_assets
 </code></pre>
 </div>
 
-<p><b>三. 为Redmine创建数据库</b></p>
+<p><b>四. 为Redmine创建数据库</b></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>mysql -u root -p
 </code></pre>
@@ -351,7 +445,7 @@ GRANT ALL PRIVILEGES ON redmine.* TO 'redmine'@'localhost';
 
 <p>上面SQL语句创建了一个叫redmine的数据库和redmine用户(密码”my_password”)。</p>
 
-<p><b>四. 安装Nginx和Phusion Passenger</b></p>
+<p><b>五. 安装Nginx和Phusion Passenger</b></p>
 
 <p>安装Passenger：</p>
 
@@ -433,7 +527,7 @@ Please specify a prefix directory [/opt/nginx]: /opt/nginx  # 设置Nginx安装�
 </code></pre>
 </div>
 
-<p><b>五. 配置Nginx</b></p>
+<p><b>六. 配置Nginx</b></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>$ vim /opt/nginx/conf/nginx.conf
 </code></pre>
@@ -611,7 +705,7 @@ systemctl start nginx
 </code></pre>
 </div>
 
-<p><b>六. 后续操作</b></p>
+<p><b>七. 后续操作</b></p>
 
 <div class="highlighter-rouge"><pre class="highlight"><code>gem install bundler
 bundle install --without development test
@@ -635,7 +729,7 @@ RAILS_ENV=production bundle exec rake redmine:load_default_data
 
 <p>直接访问地址192.168.0.124:80即可。</p>
 
-<p><b>七. 疑难问题</b></p>
+<p><b>八. 疑难问题</b></p>
 
 <p><b>1. 版本间的依赖关系</b></p>
 
@@ -692,9 +786,7 @@ end
 
 <p>然后重启Nginx服务，问题解决。</p>
 
-<p><b>3. 对mysql的编码情况查看</b></p>
-
-<p><b>4. 平台可以使用了，唯独上传文件失败</b></p>
+<p><b>3. 平台可以使用了，唯独上传文件失败</b></p>
 
 <p>这是由于没有被赋予上传文件的权限，将/var/www/redmine/files目录权限改为777即可：</p>
 
